@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/primary">
+        <item
+            android:id="@id/homeFragment"
+            android:contentDescription="@string/home_label"
+            android:icon="@drawable/baseline_home_24"
+            android:iconTint="@color/blue_400"
+            android:title="@string/home_label"
+            app:showAsAction="always" />
+        <item
+            android:id="@id/reservationHistoryFragment"
+            android:contentDescription="@string/reservations_label"
+            android:icon="@drawable/baseline_reservations_alt_24"
+            android:iconTint="@color/blue_400"
+            android:title="@string/reservations_label"
+            app:showAsAction="always" />
+        <item
+            android:id="@id/accountFragment"
+            android:contentDescription="@string/user_label"
+            android:icon="@drawable/baseline_user_24"
+            android:iconTint="@color/blue_400"
+            android:title="@string/user_label"
+            app:showAsAction="always" />
+    </group>
+</menu>
