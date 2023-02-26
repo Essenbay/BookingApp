@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/accountAccountFragment"
+    tools:viewBindingIgnore="true"
+    android:id="@+id/auth_navigation">
+
+    <fragment
+        android:id="@+id/accountAccountFragment"
+        android:name="com.example.bookingapp.views.account.AccountAccountFragment"
+        android:label="fragment_account_account"
+        tools:layout="@layout/fragment_account_account" >
+
+        <action
+            android:id="@+id/to_log_in"
+            app:destination="@id/accountLogInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/accountLogInFragment"
+        android:name="com.example.bookingapp.views.account.AccountLogInFragment"
+        android:label="AccountLogInFragment"
+        tools:layout="@layout/fragment_account_log_in">
+        <action
+            android:id="@+id/log_in_to_sign_up"
+            app:destination="@id/accountSignUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/accountSignUpFragment"
+        android:name="com.example.bookingapp.views.account.AccountSignUpFragment"
+        android:label="AccountSignUpFragment"
+        tools:layout="@layout/fragment_account_sign_up">
+        <action
+            android:id="@+id/toAccount"
+            app:popUpTo="@id/accountAccountFragment"
+            app:popUpToInclusive="true"
+            app:destination="@id/accountAccountFragment" />
+    </fragment>
+
+</navigation>

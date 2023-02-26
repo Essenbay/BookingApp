@@ -3,6 +3,25 @@
     <string name="user_label">User</string>
     <string name="home_label">Home</string>
     <string name="reservations_label">Reservations</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- User info: -->
+    <string-array name="user_full_name">
+        <item>Anonymous</item>
+        <item>%1$s</item>
+    </string-array>
+    <string name="user_email">%1$</string>
+
+    <!-- Sign up / Login -->
+    <string name="login_label">Login</string>
+    <string name="sign_up_label">Sign Up</string>
+    <string name="email_label">Email</string>
+    <string name="email_hint">Enter email</string>
+    <string name="password_label">Password</string>
+    <string name="password_hint">Enter Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+
+    <!-- Account menu -->
+    <string name="edit_account_label">Edit account</string>
+    <string name="sign_out_label">Sign out</string>
+
 </resources>
