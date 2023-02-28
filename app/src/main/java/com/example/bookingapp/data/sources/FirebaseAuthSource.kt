@@ -1,5 +1,6 @@
 package com.example.bookingapp.data.sources
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -8,8 +9,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import androidx.lifecycle.liveData
 import com.example.bookingapp.util.FirebaseResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 
-class FirebaseAuthSource private constructor() {
+class FirebaseAuthSource private constructor(
+    context: Context, private val coroutineScope: CoroutineScope = GlobalScope
+) {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var _authUser: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
     val authUser = _authUser.asStateFlow()
@@ -50,8 +55,14 @@ class FirebaseAuthSource private constructor() {
         private var INSTANCE: FirebaseAuthSource? = null
 
         fun get(): FirebaseAuthSource {
-            if (INSTANCE == null) INSTANCE = FirebaseAuthSource()
-            return INSTANCE ?: throw IllegalArgumentException("AuthSource must be initialized")
+            return INSTANCE ?: throw IllegalStateException("FirebaseAuthSource must be initialized")
+        }
+
+        fun getInitialized(context: Context): FirebaseAuthSource {
+            if (INSTANCE == null) {
+                INSTANCE = FirebaseAuthSource(context)
+            }
+            return INSTANCE ?: throw IllegalStateException("FirebaseAuthSource must be initialized")
         }
     }
 }

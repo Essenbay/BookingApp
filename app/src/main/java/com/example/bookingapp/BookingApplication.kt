@@ -6,7 +6,7 @@ import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.data.sources.FirestoreSource
 
 class BookingApplication : Application() {
-    private val firebaseAuthSource = FirebaseAuthSource.get()
+    private  val firebaseAuthSource = FirebaseAuthSource.getInitialized(this)
     private val firestoreSource = FirestoreSource.get()
 
     val firebaseUserRepository: FirebaseUserRepository by lazy {

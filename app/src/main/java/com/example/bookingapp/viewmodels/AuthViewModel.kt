@@ -15,17 +15,16 @@ import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.repositories.FirebaseUserRepository
 
 class AuthViewModel(private val firebaseUserRepository: FirebaseUserRepository) : ViewModel() {
-    private val firebaseAuthSource = FirebaseAuthSource.get()
     val userInputState: MutableStateFlow<AuthInputState> = MutableStateFlow(AuthInputState())
-    val userData: StateFlow<FirebaseUser?> = firebaseAuthSource.authUser
+    val userData: StateFlow<FirebaseUser?> = firebaseUserRepository.getUser()
 
     fun register(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
-        firebaseAuthSource.register(email, password)
+        firebaseUserRepository.register(email, password)
 
     fun login(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
-        firebaseAuthSource.login(email, password)
+        firebaseUserRepository.login(email, password)
 
-    fun signOut() = firebaseAuthSource.signOut()
+    fun signOut() = firebaseUserRepository.signOut()
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
