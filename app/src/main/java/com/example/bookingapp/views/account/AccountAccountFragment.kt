@@ -23,11 +23,11 @@ class AccountAccountFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AuthViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels { AuthViewModel.Factory }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentAccountAccountBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,7 +36,7 @@ class AccountAccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.accountToolbar.inflateMenu(R.menu.account_menu)
         binding.accountToolbar.setOnMenuItemClickListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 //Todo: add edit account function
                 R.id.edit_account -> {
                     Log.d("Account Menu", "on edit account")
@@ -52,16 +52,16 @@ class AccountAccountFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userData.collect{
-                    if(it.user == null) {
-                        binding.username.text = "Anonymous"
-                        binding.userEmail.text = "Log in or register"
+                viewModel.userData.collect {
+                    if (it == null) {
+                        binding.username.text = ""
+                        binding.userEmail.text = ""
                         val action = AccountAccountFragmentDirections.toLogIn()
                         view.findNavController().navigate(action)
                     } else {
                         Log.d("AccountAccountFragment", "On account true")
-                        binding.username.text = it.user.displayName
-                        binding.userEmail.text = it.user.email
+                        binding.username.text = it.displayName
+                        binding.userEmail.text = it.email
                     }
                 }
             }
