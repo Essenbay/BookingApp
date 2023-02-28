@@ -30,7 +30,7 @@ class AuthViewModel(private val firebaseUserRepository: FirebaseUserRepository) 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as BookingApplication)
-                val userRepository = application.firebaseUserRepository
+                val userRepository = application.container.firebaseUserRepository
                 AuthViewModel(userRepository)
             }
         }

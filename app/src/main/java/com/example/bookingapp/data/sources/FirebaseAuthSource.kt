@@ -12,9 +12,7 @@ import com.example.bookingapp.util.FirebaseResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 
-class FirebaseAuthSource private constructor(
-    context: Context, private val coroutineScope: CoroutineScope = GlobalScope
-) {
+class FirebaseAuthSource {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var _authUser: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
     val authUser = _authUser.asStateFlow()
@@ -49,20 +47,5 @@ class FirebaseAuthSource private constructor(
     fun signOut() {
         auth.signOut()
         _authUser.update { auth.currentUser }
-    }
-
-    companion object {
-        private var INSTANCE: FirebaseAuthSource? = null
-
-        fun get(): FirebaseAuthSource {
-            return INSTANCE ?: throw IllegalStateException("FirebaseAuthSource must be initialized")
-        }
-
-        fun getInitialized(context: Context): FirebaseAuthSource {
-            if (INSTANCE == null) {
-                INSTANCE = FirebaseAuthSource(context)
-            }
-            return INSTANCE ?: throw IllegalStateException("FirebaseAuthSource must be initialized")
-        }
     }
 }

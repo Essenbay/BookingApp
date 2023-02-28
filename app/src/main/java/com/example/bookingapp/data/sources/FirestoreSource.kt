@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class FirestoreSource private constructor(){
+class FirestoreSource {
     private val db: FirebaseFirestore = Firebase.firestore
 
     suspend fun createUser(
@@ -30,14 +30,5 @@ class FirestoreSource private constructor(){
 
     suspend fun getReservations(userID: String): FirebaseResult<List<Reservation>> {
         TODO("Not yet implemented")
-    }
-
-    companion object {
-        private var INSTANCE: FirestoreSource? = null
-
-        fun get(): FirestoreSource {
-            if (INSTANCE == null) INSTANCE = FirestoreSource()
-            return INSTANCE ?: throw IllegalArgumentException("FirestoreSource must be initialized")
-        }
     }
 }

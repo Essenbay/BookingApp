@@ -1,15 +1,16 @@
 package com.example.bookingapp
 
 import android.app.Application
+import com.example.bookingapp.data.AppContainer
 import com.example.bookingapp.data.repositories.FirebaseUserRepository
 import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.data.sources.FirestoreSource
 
 class BookingApplication : Application() {
-    private  val firebaseAuthSource = FirebaseAuthSource.getInitialized(this)
-    private val firestoreSource = FirestoreSource.get()
+    lateinit var container: AppContainer
 
-    val firebaseUserRepository: FirebaseUserRepository by lazy {
-        FirebaseUserRepository(firebaseAuthSource, firestoreSource)
+    override fun onCreate() {
+        super.onCreate()
+        container = AppContainer()
     }
 }
