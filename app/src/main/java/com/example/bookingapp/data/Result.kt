@@ -1,4 +1,4 @@
-package com.example.bookingapp.data.firestore.models
+package com.example.bookingapp.data
 
 sealed class Result<out R> {
     data class Success<out T>(val data: T) : Result<T>()

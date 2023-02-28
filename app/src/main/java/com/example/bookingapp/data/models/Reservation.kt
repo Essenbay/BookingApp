@@ -1,4 +1,4 @@
-package com.example.bookingapp.data.firestore
+package com.example.bookingapp.data.models
 
 import com.google.firebase.firestore.DocumentId
 

@@ -24,9 +24,9 @@
     <EditText
         android:id="@+id/edit_login_email"
         android:layout_width="match_parent"
-        android:inputType="textEmailAddress"
         android:layout_height="wrap_content"
-        android:hint="@string/email_hint" />
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress" />
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Headline6"
@@ -37,10 +37,11 @@
 
     <EditText
         android:id="@+id/edit_login_password"
-        android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/password_hint" />
+        android:hint="@string/password_hint"
+        android:inputType="textPassword" />
+
 
     <Button
         android:id="@+id/login_btn"
@@ -52,14 +53,12 @@
         android:text="@string/login_label" />
 
     <TextView
-        style="@style/TextAppearance.Material3.BodyLarge"
         android:id="@+id/to_signup_btn"
+        style="@style/TextAppearance.Material3.BodyLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
-        android:text="or sign up"
         android:padding="10dp"
+        android:text="or sign up"
         android:textColor="@color/blue_200" />
-
-
 </LinearLayout>
