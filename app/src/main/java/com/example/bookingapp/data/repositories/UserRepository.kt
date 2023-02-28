@@ -1,6 +1,7 @@
 package com.example.bookingapp.data.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.example.bookingapp.data.models.User
 import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.data.sources.FirestoreSource
@@ -20,10 +21,34 @@ class FirebaseUserRepository(
         TODO("Not yet implemented")
     }
 
-    fun getUser():StateFlow<FirebaseUser?> = firebaseAuthSource.authUser
+    fun getUser(): StateFlow<FirebaseUser?> = firebaseAuthSource.authUser
 
-    fun register(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
-        firebaseAuthSource.register(email, password)
+    fun createUser(email: String, password: String): LiveData<FirebaseResult<Boolean>> = liveData {
+        emit(
+            startCreatingUser(email, password)
+        )
+    }
+
+    private suspend fun startCreatingUser(
+        email: String,
+        password: String
+    ): FirebaseResult<Boolean> {
+        var result: FirebaseResult<Boolean> = FirebaseResult.Loading
+
+        val userFirstname = "Assel"
+        val userLastname = "Essenbay"
+
+        val authResult = firebaseAuthSource.register(email, password)
+        authResult.let {
+            if (it is FirebaseResult.Success) {
+                result = firestoreSource.createUser(it.data, userFirstname, userLastname)
+            } else if (it is FirebaseResult.Error) {
+                result = FirebaseResult.Error(it.exception)
+            }
+        }
+        return result
+    }
+
 
     fun login(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
         firebaseAuthSource.login(email, password)

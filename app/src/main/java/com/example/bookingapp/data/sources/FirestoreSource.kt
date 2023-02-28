@@ -6,6 +6,8 @@ import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class FirestoreSource {
     private val db: FirebaseFirestore = Firebase.firestore
@@ -14,9 +16,14 @@ class FirestoreSource {
         firebaseUserUid: String,
         userFirstname: String,
         userLastname: String
-    ) {
+    ): FirebaseResult<Boolean> = suspendCoroutine { cont ->
         val newUser = User(firebaseUserUid, userFirstname, userLastname)
-        db.collection("users").document(newUser.uid).set(newUser)
+        db.collection("users").document(newUser.uid)
+            .set(newUser).addOnSuccessListener {
+                cont.resume(FirebaseResult.Success(true))
+            }.addOnFailureListener {
+                cont.resume(FirebaseResult.Error(it))
+            }
     }
 
     suspend fun getUser(): FirebaseResult<User> {

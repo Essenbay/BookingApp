@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,7 @@ class AuthViewModel(private val firebaseUserRepository: FirebaseUserRepository) 
     val userData: StateFlow<FirebaseUser?> = firebaseUserRepository.getUser()
 
     fun register(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
-        firebaseUserRepository.register(email, password)
+        firebaseUserRepository.createUser(email, password)
 
     fun login(email: String, password: String): LiveData<FirebaseResult<Boolean>> =
         firebaseUserRepository.login(email, password)

@@ -1,6 +1,7 @@
 package com.example.bookingapp.data.sources
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -17,19 +18,22 @@ class FirebaseAuthSource {
     private var _authUser: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
     val authUser = _authUser.asStateFlow()
 
-    fun register(email: String, password: String): LiveData<FirebaseResult<Boolean>> = liveData {
-        emit(
-            suspendCoroutine { cont ->
-                auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
+    suspend fun register(email: String, password: String): FirebaseResult<String> =
+        suspendCoroutine { cont ->
+            Log.d("FirebaseAuthSource", "Auth is registering")
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener {
                     _authUser.update { auth.currentUser }
-
-                    cont.resume(FirebaseResult.Success(true))
-                }.addOnFailureListener {
+                    cont.resume(
+                        FirebaseResult.Success(
+                            auth.currentUser?.uid ?: throw IllegalStateException("New user must not be null")
+                        )
+                    )
+                }
+                .addOnFailureListener {
                     cont.resume(FirebaseResult.Error(it))
                 }
-            }
-        )
-    }
+        }
 
     fun login(email: String, password: String): LiveData<FirebaseResult<Boolean>> = liveData {
         emit(
