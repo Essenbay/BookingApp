@@ -9,13 +9,15 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.bookingapp.databinding.FragmentAccountLogInBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.checkLoginField
 import com.example.bookingapp.util.checkPasswordField
-import com.example.bookingapp.viewmodels.AuthViewModel
+import com.example.bookingapp.viewmodels.AccountViewModel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 
 class AccountLogInFragment : Fragment() {
@@ -24,7 +26,7 @@ class AccountLogInFragment : Fragment() {
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val viewModel: AuthViewModel by viewModels { AuthViewModel.Factory }
+    private val viewModel: AccountViewModel by viewModels { AccountViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +64,9 @@ class AccountLogInFragment : Fragment() {
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    login(email, password, view)
+                    binding.progressCircular.visibility = View.VISIBLE
+                    login(email, password, view).start()
+                    Log.d("LoginFragment", "login completed?")
                 }
             }
             toSignupBtn.setOnClickListener {
@@ -76,27 +80,20 @@ class AccountLogInFragment : Fragment() {
         }
     }
 
-    private fun login(email: String, password: String, view: View) {
-        viewModel.login(email, password).observe(viewLifecycleOwner) { firebaseResult ->
-            firebaseResult?.let { result ->
-                when (result) {
-                    is FirebaseResult.Success -> {
-                        Toast.makeText(context, "Successfully logged in", Toast.LENGTH_LONG).show()
-                        viewModel.userInputState.update {
-                            it.copy(passwordInput = "", emailInput = "")
-                        }
-                        view.findNavController().popBackStack()
-                    }
-                    is FirebaseResult.Error -> {
-                        Toast.makeText(
-                            context,
-                            result.exception.localizedMessage ?: "Unknown error", Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    is FirebaseResult.Loading -> {
-                        Toast.makeText(context, "Loading...", Toast.LENGTH_LONG).show()
-                    }
-                }
+    private fun login(email: String, password: String, view: View) = viewLifecycleOwner.lifecycleScope.launch {
+        binding.progressCircular.visibility = View.VISIBLE
+        when(val result = viewModel.login(email, password)){
+            is FirebaseResult.Success -> {
+                Toast.makeText(context, "Successfully logged in", Toast.LENGTH_LONG).show()
+                Log.d("LoginFragment", "Current user: ${viewModel.user.last()}")
+                view.findNavController().popBackStack()
+            }
+            is FirebaseResult.Error -> {
+                Toast.makeText(
+                    context,
+                    result.exception.localizedMessage ?: "Unknown error", Toast.LENGTH_LONG
+                ).show()
+                binding.progressCircular.visibility = View.INVISIBLE
             }
         }
     }

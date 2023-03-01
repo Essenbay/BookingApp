@@ -13,6 +13,16 @@ fun checkLoginField(emailInput: String): Boolean {
     return isValid
 }
 
+fun checkPhoneNumberField(phoneNumberInput: String): Boolean {
+    var isValid = true
+    val matcher = Patterns.PHONE.matcher(phoneNumberInput)
+    if (!matcher.matches()) {
+        isValid = false
+    }
+
+    return isValid
+}
+
 fun checkPasswordField(passwordInput: String): Boolean {
     return passwordInput.length >= 6
 }

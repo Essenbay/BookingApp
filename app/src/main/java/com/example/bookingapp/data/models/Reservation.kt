@@ -12,4 +12,5 @@ data class Reservation(
 ) {
     @Suppress("unused")
     constructor() : this("", "", "")
+    constructor(establishmentId: String, userID: String) : this("", establishmentId, userID)
 }

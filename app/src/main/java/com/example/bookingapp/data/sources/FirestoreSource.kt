@@ -1,41 +1,84 @@
 package com.example.bookingapp.data.sources
 
+import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.models.User
 import com.example.bookingapp.util.FirebaseResult
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+const val USER_COLLECTION = "users"
+const val RESERVATION_COLLECTION = "reservations"
+const val ESTABLISHMENT_COLLECTION = "establishments"
+
+
 class FirestoreSource {
     private val db: FirebaseFirestore = Firebase.firestore
-
     suspend fun createUser(
         firebaseUserUid: String,
-        userFirstname: String,
-        userLastname: String
-    ): FirebaseResult<Boolean> = suspendCoroutine { cont ->
-        val newUser = User(firebaseUserUid, userFirstname, userLastname)
-        db.collection("users").document(newUser.uid)
+        fullName: String,
+        phoneNumber: String
+    ): FirebaseResult<User> = suspendCoroutine { cont ->
+        val newUser = User(fullName, firebaseUserUid, phoneNumber, emptyList())
+        db.collection(USER_COLLECTION).document(newUser.uid)
             .set(newUser).addOnSuccessListener {
-                cont.resume(FirebaseResult.Success(true))
+                cont.resume(FirebaseResult.Success(newUser))
             }.addOnFailureListener {
                 cont.resume(FirebaseResult.Error(it))
             }
     }
 
-    suspend fun getUser(): FirebaseResult<User> {
-        TODO("Not yet implemented")
+    suspend fun getUser(userID: String): FirebaseResult<User> = suspendCoroutine { cont ->
+        val docRef = db.collection(USER_COLLECTION).document(userID)
+        docRef.get()
+            .addOnSuccessListener {
+                if (it != null) {
+                    val resultUser = it.toObject(User::class.java)
+                    if (resultUser == null) cont.resume(
+                        FirebaseResult.Error(Exception("Can not create user object"))
+                    ) else {
+                        cont.resume(FirebaseResult.Success(resultUser))
+                    }
+                }
+            }.addOnFailureListener {
+                FirebaseResult.Error(it)
+            }
     }
 
-
-    suspend fun addUser(user: User) {
-        db.collection("users").add(user)
-    }
+//    suspend fun deleteUser(firebaseUserUid: String): FirebaseResult<Boolean> =
+//        suspendCoroutine { cont ->
+//            db.collection(USER_COLLECTION).document(firebaseUserUid).delete()
+//                .addOnSuccessListener {
+//                    cont.resume(FirebaseResult.Success(true))
+//                }.addOnFailureListener {
+//                    cont.resume(FirebaseResult.Error(it))
+//                }
+//            //Todo: deleting user does not delete its reservations
+//        }
 
     suspend fun getReservations(userID: String): FirebaseResult<List<Reservation>> {
         TODO("Not yet implemented")
     }
+
+    suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
+        suspendCoroutine { cont ->
+            val snapshot = db.collection(ESTABLISHMENT_COLLECTION).get()
+            val establishments: MutableList<Establishment> = mutableListOf()
+            snapshot
+                .addOnSuccessListener { result ->
+                    for (document in result) {
+                        val establishment = document.toObject(Establishment::class.java)
+                        establishments.add(establishment)
+                    }
+                    cont.resume(FirebaseResult.Success(establishments))
+                }
+                .addOnFailureListener {
+                    cont.resume(FirebaseResult.Error(it))
+                }
+        }
 }

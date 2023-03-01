@@ -13,7 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentAccountAccountBinding
-import com.example.bookingapp.viewmodels.AuthViewModel
+import com.example.bookingapp.viewmodels.AccountViewModel
 import kotlinx.coroutines.launch
 
 class AccountAccountFragment : Fragment() {
@@ -23,7 +23,7 @@ class AccountAccountFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AuthViewModel by viewModels { AuthViewModel.Factory }
+    private val viewModel: AccountViewModel by viewModels { AccountViewModel.Factory }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,9 +37,9 @@ class AccountAccountFragment : Fragment() {
         binding.accountToolbar.inflateMenu(R.menu.account_menu)
         binding.accountToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                //Todo: add edit account function
-                R.id.edit_account -> {
+                R.id.editAccountFragment -> {
                     Log.d("Account Menu", "on edit account")
+                    view.findNavController().navigate(R.id.to_edit_account)
                     true
                 }
                 R.id.sign_out -> {
@@ -52,16 +52,14 @@ class AccountAccountFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userData.collect {
+                viewModel.user.collect {
                     if (it == null) {
                         binding.username.text = ""
                         binding.userEmail.text = ""
                         val action = AccountAccountFragmentDirections.toLogIn()
                         view.findNavController().navigate(action)
                     } else {
-                        Log.d("AccountAccountFragment", "On account true")
-                        binding.username.text = it.displayName
-                        binding.userEmail.text = it.email
+                        binding.username.text = it.fullName
                     }
                 }
             }

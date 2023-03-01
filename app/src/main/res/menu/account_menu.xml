@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/edit_account"
-        android:contentDescription="@string/edit_account_label"
-        android:title="@string/edit_account_label"
+        android:id="@+id/editAccountFragment"
+        android:contentDescription="@string/to_edit_account_label"
+        android:title="@string/to_edit_account_label"
         app:showAsAction="never" />
     <item
         android:id="@+id/sign_out"

@@ -5,9 +5,10 @@ import com.google.firebase.firestore.DocumentId
 data class User(
     @DocumentId
     val uid: String,
-    val firstname: String,
-    val lastname: String
+    val fullName: String,
+    val phoneNumber: String,
+    val reservationIds: List<String>
 ) {
     @Suppress("unused")
-    constructor() : this("", "", "")
+    constructor() : this("", "", "", emptyList())
 }
