@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.bookingapp.databinding.FragmentAccountSignUpBinding
 import com.example.bookingapp.util.*
@@ -93,7 +94,7 @@ class AccountSignUpFragment : Fragment() {
         phoneNumber: String,
         password: String,
         view: View
-    ) = CoroutineScope(Dispatchers.Default).launch {
+    ) = viewLifecycleOwner.lifecycleScope.launch {
         binding.progressCircular.visibility = View.VISIBLE
         when (val result = viewModel.register(fullName, email, phoneNumber, password)) {
             is FirebaseResult.Success -> {

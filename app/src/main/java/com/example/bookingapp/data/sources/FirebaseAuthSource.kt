@@ -12,9 +12,11 @@ import com.example.bookingapp.util.FirebaseResult
 
 class FirebaseAuthSource {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
-
     fun getAuthCurrentUser(): FirebaseUser? = auth.currentUser
+
+    init {
+        auth.currentUser?.reload()
+    }
 
     suspend fun register(email: String, password: String): FirebaseResult<String> =
         suspendCoroutine { cont ->

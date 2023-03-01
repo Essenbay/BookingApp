@@ -1,5 +1,6 @@
 package com.example.bookingapp.data.sources
 
+import android.util.Log
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.models.User
@@ -24,7 +25,7 @@ class FirestoreSource {
         fullName: String,
         phoneNumber: String
     ): FirebaseResult<User> = suspendCoroutine { cont ->
-        val newUser = User(fullName, firebaseUserUid, phoneNumber, emptyList())
+        val newUser = User(firebaseUserUid, fullName, phoneNumber, emptyList())
         db.collection(USER_COLLECTION).document(newUser.uid)
             .set(newUser).addOnSuccessListener {
                 cont.resume(FirebaseResult.Success(newUser))
@@ -33,16 +34,19 @@ class FirestoreSource {
             }
     }
 
-    suspend fun getUser(userID: String): FirebaseResult<User> = suspendCoroutine { cont ->
+    suspend fun getUser(userID: String): User = suspendCoroutine { cont ->
         val docRef = db.collection(USER_COLLECTION).document(userID)
         docRef.get()
             .addOnSuccessListener {
                 if (it != null) {
                     val resultUser = it.toObject(User::class.java)
-                    if (resultUser == null) cont.resume(
-                        FirebaseResult.Error(Exception("Can not create user object"))
-                    ) else {
-                        cont.resume(FirebaseResult.Success(resultUser))
+                    Log.d("FirestoreSource", resultUser.toString())
+                    if (resultUser == null) {
+                        cont.resume(
+                            throw Exception("Can not create user object")
+                        )
+                    } else {
+                        cont.resume(resultUser)
                     }
                 }
             }.addOnFailureListener {

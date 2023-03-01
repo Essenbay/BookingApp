@@ -1,27 +1,21 @@
 package com.example.bookingapp.data.repositories
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
+import android.content.Context
+import android.util.Log
 import com.example.bookingapp.data.models.User
 import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.data.sources.FirestoreSource
 import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
 import java.lang.Exception
-import kotlin.coroutines.suspendCoroutine
 
 class FirebaseUserRepository(
     private val firebaseAuthSource: FirebaseAuthSource,
     private val firestoreSource: FirestoreSource
 ) {
-    private var _user: MutableSharedFlow<User?> = MutableStateFlow(null)
-    val user: SharedFlow<User?> = _user
-
-    private suspend fun getUser(): User? {
-        val authUser = firebaseAuthSource.getAuthCurrentUser() ?: return null
-        val user = firestoreSource.getUser(authUser.uid)
+    suspend fun getUser(): User? {
+        val authUser: FirebaseUser = firebaseAuthSource.getAuthCurrentUser() ?: return null
+        return firestoreSource.getUser(authUser.uid)
     }
 
     suspend fun createUser(
@@ -37,7 +31,6 @@ class FirebaseUserRepository(
                 val createdUser = firestoreSource.createUser(it.data, fullName, phoneNumber)
                 createdUser.let { firestoreResult ->
                     if (firestoreResult is FirebaseResult.Success) {
-                        _user.emit(firestoreResult.data)
                         result = FirebaseResult.Success(true)
                     } else if (firestoreResult is FirebaseResult.Error) {
                         result = FirebaseResult.Error(firestoreResult.exception)
@@ -56,7 +49,6 @@ class FirebaseUserRepository(
 
     suspend fun signOut() {
         firebaseAuthSource.signOut()
-        _user.emit(null)
     }
 
 //    suspend fun deleteUser(): FirebaseResult<Boolean> {

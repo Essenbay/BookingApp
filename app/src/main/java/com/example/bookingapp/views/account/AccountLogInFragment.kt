@@ -66,7 +66,6 @@ class AccountLogInFragment : Fragment() {
                 } else {
                     binding.progressCircular.visibility = View.VISIBLE
                     login(email, password, view).start()
-                    Log.d("LoginFragment", "login completed?")
                 }
             }
             toSignupBtn.setOnClickListener {

@@ -6,20 +6,25 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.util.FirebaseResult
-import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.User
 import com.example.bookingapp.data.repositories.FirebaseUserRepository
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class AccountViewModel(private val firebaseUserRepository: FirebaseUserRepository) : ViewModel() {
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     val userInputState: MutableStateFlow<AuthInputState> = MutableStateFlow(AuthInputState())
-    val user: SharedFlow<User?> = firebaseUserRepository.user
+    private var _user: MutableStateFlow<User?> = MutableStateFlow(null)
+    val user: StateFlow<User?> = _user.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _user.emit(firebaseUserRepository.getUser())
+        }
+    }
 
     suspend fun register(
         fullName: String,
@@ -28,6 +33,7 @@ class AccountViewModel(private val firebaseUserRepository: FirebaseUserRepositor
         password: String
     ): FirebaseResult<Boolean> =
         firebaseUserRepository.createUser(fullName, email, phoneNumber, password)
+
 
     suspend fun login(email: String, password: String): FirebaseResult<Boolean> =
         firebaseUserRepository.login(email, password)
