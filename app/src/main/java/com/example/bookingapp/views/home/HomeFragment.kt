@@ -7,13 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView.OnQueryTextListener
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bookingapp.databinding.FragmentHomeBinding
-import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.viewmodels.HomeViewModel
 import com.example.bookingapp.viewmodels.SearchResult
 import com.google.android.material.snackbar.Snackbar
@@ -52,36 +50,33 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.establishments.collect {
-                    when (it) {
-                        is FirebaseResult.Success -> {
-                            var establishmentsStr = "List: "
-                            it.data.forEach { e -> establishmentsStr += e.name + '\n' }
-                            binding.establishments.text = establishmentsStr
-                        }
-                        is FirebaseResult.Error -> Toast.makeText(
-                            context,
-                            "Could not load establishments",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                viewModel.filteredEstablishments.collect {
+                    handleFilteredEstablishments(it)
                 }
             }
         }
     }
 
     private fun onSearch(query: String?) = viewLifecycleOwner.lifecycleScope.launch {
-        if (query == null || query.isBlank()) viewModel.getAllEstablishments()
-        else {
-            when (val result = viewModel.searchEstablishments(query)) {
-                //The list is changed in view layer
-                is SearchResult.Success -> {}
-                is SearchResult.Empty -> {binding.emptyResultMsg.visibility = View.VISIBLE}
-                is SearchResult.Error -> {
-                    //Show error
-                    view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
-                    Log.d("HomeFragment", result.exception.toString())
-                }
+        viewModel.searchEstablishments(query)
+    }
+
+    private fun handleFilteredEstablishments(result: SearchResult) {
+        when (result) {
+            is SearchResult.Success -> {
+                var resultStr = "Establishments: \n"
+                for (e in result.establishments) resultStr += e.name + '\n'
+                binding.establishments.text = resultStr
+                binding.emptyResultMsg.visibility = View.INVISIBLE
+            }
+            is SearchResult.Empty -> {
+                binding.establishments.text = ""
+                binding.emptyResultMsg.visibility = View.VISIBLE
+            }
+            is SearchResult.Error -> {
+                binding.emptyResultMsg.visibility = View.INVISIBLE
+                view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
+                Log.d("HomeFragment", result.exception.toString())
             }
         }
     }

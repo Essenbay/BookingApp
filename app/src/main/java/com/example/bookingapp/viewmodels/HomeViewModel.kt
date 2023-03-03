@@ -8,51 +8,58 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.repositories.EstablishmentRepository
-import com.example.bookingapp.data.repositories.FirebaseUserRepository
 import com.example.bookingapp.util.FirebaseResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 sealed class SearchResult {
     object Empty : SearchResult()
     data class Error(val exception: Exception) : SearchResult()
-    object Success : SearchResult()
+    data class Success(val establishments: List<Establishment>) : SearchResult()
 }
 
 class HomeViewModel(private val firebaseEstablishmentRepository: EstablishmentRepository) :
     ViewModel() {
+    private var _firestoreEstablishments: List<Establishment> = emptyList()
+    private var _filteredEstablishments: MutableStateFlow<SearchResult> =
+        MutableStateFlow(SearchResult.Empty)
+    val filteredEstablishments = _filteredEstablishments.asStateFlow()
 
-    private var _establishments: MutableStateFlow<FirebaseResult<List<Establishment>>> =
-        MutableStateFlow(
-            FirebaseResult.Success(
-                emptyList()
-            )
-        )
-    val establishments = _establishments.asStateFlow()
 
     init {
-        getAllEstablishments()
-    }
-
-    fun getAllEstablishments() {
         viewModelScope.launch {
-            _establishments.update { firebaseEstablishmentRepository.getEstablishments() }
-        }
-    }
-
-    suspend fun searchEstablishments(query: String): SearchResult {
-        return when (val result = firebaseEstablishmentRepository.searchEstablishments(query)) {
-            is FirebaseResult.Success -> {
-                _establishments.update { result }
-                if (result.data.isEmpty()) SearchResult.Empty
-                else SearchResult.Success
+            when (val result = firebaseEstablishmentRepository.getEstablishments()) {
+                is FirebaseResult.Success -> {
+                    _firestoreEstablishments = result.data
+                    searchEstablishments("")
+                }
+                is FirebaseResult.Error -> _filteredEstablishments.update {
+                    SearchResult.Error(result.exception)
+                }
             }
-            is FirebaseResult.Error -> SearchResult.Error(result.exception)
         }
     }
 
+    suspend fun searchEstablishments(query: String?) {
+        _filteredEstablishments.update { startSearchEstablishments(query) }
+    }
+    private suspend fun startSearchEstablishments(query: String?): SearchResult = suspendCoroutine { cont ->
+        if (query == null || query.isBlank()) cont.resume(
+            SearchResult.Success(_firestoreEstablishments)
+        )
+        else {
+            val resultList = mutableListOf<Establishment>()
+            for (e in _firestoreEstablishments) {
+                if (e.name.lowercase().contains(query.lowercase())) resultList.add(e)
+            }
+            if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
+            else cont.resume(SearchResult.Success(resultList))
+        }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

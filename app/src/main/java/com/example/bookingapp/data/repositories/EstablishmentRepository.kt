@@ -8,6 +8,6 @@ class EstablishmentRepository(
     private val firebaseRepository: FirebaseUserRepository,
     private val firestoreSource: FirestoreSource
 ) {
+
     suspend fun getEstablishments(): FirebaseResult<List<Establishment>> = firestoreSource.getEstablishments()
-    suspend fun searchEstablishments(query: String) : FirebaseResult<List<Establishment>> = firestoreSource.searchEstablishments(query)
 }

@@ -85,26 +85,4 @@ class FirestoreSource {
                 }
         }
 
-    suspend fun searchEstablishments(query: String): FirebaseResult<List<Establishment>> =
-        suspendCoroutine { cont ->
-            db.collection(ESTABLISHMENT_COLLECTION).whereArrayContains("name", query.trim())
-                .limit(50).get()
-                .addOnSuccessListener {
-                    val resultList = mutableListOf<Establishment>()
-                    it.documents.forEach { doc ->
-                        val resultDoc = doc.toObject(Establishment::class.java)
-                        if (resultDoc == null) Log.d(
-                            "FirestoreSource",
-                            "Could not get establishment: ${doc.data}"
-                        )
-                        else resultList.add(resultDoc)
-                    }
-                    cont.resume(FirebaseResult.Success(resultList))
-                }
-                .addOnFailureListener {
-                    cont.resume(FirebaseResult.Error(it))
-                }
-
-        }
-
 }
