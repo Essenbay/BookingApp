@@ -55,11 +55,10 @@ class AccountAccountFragment : Fragment() {
                 viewModel.user.collect {
                     if (it == null) {
                         binding.username.text = ""
-                        binding.userEmail.text = ""
                         val action = AccountAccountFragmentDirections.toLogIn()
                         view.findNavController().navigate(action)
                     } else {
-                        binding.username.text = it.fullName
+                        binding.username.text = it.displayName
                     }
                 }
             }

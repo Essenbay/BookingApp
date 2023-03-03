@@ -1,17 +1,13 @@
 package com.example.bookingapp.data.repositories
 
-import androidx.lifecycle.viewModelScope
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.sources.FirebaseAuthSource
 import com.example.bookingapp.data.sources.FirestoreSource
 import com.example.bookingapp.util.FirebaseResult
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class EstablishmentRepository(
-    private val firebaseAuthSource: FirebaseAuthSource,
+    private val firebaseRepository: FirebaseUserRepository,
     private val firestoreSource: FirestoreSource
 ) {
-
+    suspend fun getEstablishments(): FirebaseResult<List<Establishment>> = firestoreSource.getEstablishments()
+    suspend fun searchEstablishments(query: String) : FirebaseResult<List<Establishment>> = firestoreSource.searchEstablishments(query)
 }

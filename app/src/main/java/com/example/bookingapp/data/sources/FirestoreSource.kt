@@ -5,11 +5,10 @@ import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.models.User
 import com.example.bookingapp.util.FirebaseResult
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.lang.Exception
+import kotlin.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -85,4 +84,27 @@ class FirestoreSource {
                     cont.resume(FirebaseResult.Error(it))
                 }
         }
+
+    suspend fun searchEstablishments(query: String): FirebaseResult<List<Establishment>> =
+        suspendCoroutine { cont ->
+            db.collection(ESTABLISHMENT_COLLECTION).whereArrayContains("name", query.trim())
+                .limit(50).get()
+                .addOnSuccessListener {
+                    val resultList = mutableListOf<Establishment>()
+                    it.documents.forEach { doc ->
+                        val resultDoc = doc.toObject(Establishment::class.java)
+                        if (resultDoc == null) Log.d(
+                            "FirestoreSource",
+                            "Could not get establishment: ${doc.data}"
+                        )
+                        else resultList.add(resultDoc)
+                    }
+                    cont.resume(FirebaseResult.Success(resultList))
+                }
+                .addOnFailureListener {
+                    cont.resume(FirebaseResult.Error(it))
+                }
+
+        }
+
 }

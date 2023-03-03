@@ -1,66 +1,62 @@
 package com.example.bookingapp.data.repositories
 
-import android.content.Context
 import android.util.Log
-import com.example.bookingapp.data.models.User
-import com.example.bookingapp.data.sources.FirebaseAuthSource
-import com.example.bookingapp.data.sources.FirestoreSource
 import com.example.bookingapp.util.FirebaseResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import java.lang.Exception
+import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.flow.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-class FirebaseUserRepository(
-    private val firebaseAuthSource: FirebaseAuthSource,
-    private val firestoreSource: FirestoreSource
-) {
-    suspend fun getUser(): User? {
-        val authUser: FirebaseUser = firebaseAuthSource.getAuthCurrentUser() ?: return null
-        return firestoreSource.getUser(authUser.uid)
+class FirebaseUserRepository() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var _user: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
+    val user: StateFlow<FirebaseUser?> = _user.asStateFlow()
+    fun getAuthCurrentUser(): FirebaseUser? = auth.currentUser
+
+    init {
+        auth.currentUser?.reload()
     }
 
-    suspend fun createUser(
-        fullName: String,
+    suspend fun register(
         email: String,
-        phoneNumber: String,
-        password: String
-    ): FirebaseResult<Boolean> {
-        var result: FirebaseResult<Boolean> = FirebaseResult.Error(Exception("Unknown exception"))
-        val authResult = firebaseAuthSource.register(email, password)
-        authResult.let {
-            if (it is FirebaseResult.Success) {
-                val createdUser = firestoreSource.createUser(it.data, fullName, phoneNumber)
-                createdUser.let { firestoreResult ->
-                    if (firestoreResult is FirebaseResult.Success) {
-                        result = FirebaseResult.Success(true)
-                    } else if (firestoreResult is FirebaseResult.Error) {
-                        result = FirebaseResult.Error(firestoreResult.exception)
+        password: String,
+        fullName: String
+    ): FirebaseResult<Boolean> =
+        suspendCoroutine { cont ->
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener {
+                    auth.currentUser?.updateProfile(
+                        UserProfileChangeRequest.Builder().setDisplayName(fullName).build()
+                    ) ?: throw IllegalStateException("Could not find currentUser")
+                    _user.update {
+                        auth.currentUser
                     }
+                    cont.resume(FirebaseResult.Success(true))
                 }
-            } else if (it is FirebaseResult.Error) {
-                result = FirebaseResult.Error(it.exception)
-            }
+                .addOnFailureListener {
+                    cont.resume(FirebaseResult.Error(it))
+                }
         }
-        return result
-    }
-
 
     suspend fun login(email: String, password: String): FirebaseResult<Boolean> =
-        firebaseAuthSource.login(email, password)
+        suspendCoroutine { cont ->
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener {
+                    _user.update { auth.currentUser }
+                    Log.d("FirebaseUserRepository", "Updating user: ${_user.value.toString()}")
+                    cont.resume(FirebaseResult.Success(true))
+                }
+                .addOnFailureListener {
+                    cont.resume(FirebaseResult.Error(it))
+                }
+        }
 
-    suspend fun signOut() {
-        firebaseAuthSource.signOut()
+    fun signOut() {
+        auth.signOut()
+        _user.update {
+            auth.currentUser
+        }
     }
-
-//    suspend fun deleteUser(): FirebaseResult<Boolean> {
-//        var result: FirebaseResult<Boolean> = FirebaseResult.Loading
-//        val authResult = firebaseAuthSource.deleteUser()
-//        authResult.let {
-//            if (it is FirebaseResult.Success) {
-//                result = firestoreSource.deleteUser(it.data)
-//            } else if (it is FirebaseResult.Error) {
-//                result = FirebaseResult.Error(it.exception)
-//            }
-//        }
-//        return result
-//    }
 }

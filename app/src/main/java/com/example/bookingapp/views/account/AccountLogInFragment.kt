@@ -84,7 +84,6 @@ class AccountLogInFragment : Fragment() {
         when(val result = viewModel.login(email, password)){
             is FirebaseResult.Success -> {
                 Toast.makeText(context, "Successfully logged in", Toast.LENGTH_LONG).show()
-                Log.d("LoginFragment", "Current user: ${viewModel.user.last()}")
                 view.findNavController().popBackStack()
             }
             is FirebaseResult.Error -> {

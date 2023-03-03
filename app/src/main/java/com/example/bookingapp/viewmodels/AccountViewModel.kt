@@ -1,47 +1,40 @@
 package com.example.bookingapp.viewmodels
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.bookingapp.util.FirebaseResult
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
-import com.example.bookingapp.data.models.User
 import com.example.bookingapp.data.repositories.FirebaseUserRepository
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import com.example.bookingapp.util.FirebaseResult
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AccountViewModel(private val firebaseUserRepository: FirebaseUserRepository) : ViewModel() {
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     val userInputState: MutableStateFlow<AuthInputState> = MutableStateFlow(AuthInputState())
-    private var _user: MutableStateFlow<User?> = MutableStateFlow(null)
-    val user: StateFlow<User?> = _user.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _user.emit(firebaseUserRepository.getUser())
-        }
-    }
+    val user: StateFlow<FirebaseUser?> = firebaseUserRepository.user
 
     suspend fun register(
         fullName: String,
         email: String,
-        phoneNumber: String,
         password: String
-    ): FirebaseResult<Boolean> =
-        firebaseUserRepository.createUser(fullName, email, phoneNumber, password)
+    ): FirebaseResult<Boolean> = withContext(viewModelScope.coroutineContext) {
+        firebaseUserRepository.register(email, password, fullName)
+    }
 
 
     suspend fun login(email: String, password: String): FirebaseResult<Boolean> =
         firebaseUserRepository.login(email, password)
 
 
-    fun signOut() = viewModelScope.launch {
-        firebaseUserRepository.signOut()
-    }
+    fun signOut() = firebaseUserRepository.signOut()
 
 //    fun deleteAccount(): LiveData<FirebaseResult<Boolean>> = firebaseUserRepository.deleteUser()
 

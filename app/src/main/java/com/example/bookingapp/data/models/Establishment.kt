@@ -9,5 +9,6 @@ data class Establishment(
     val name: String
 ) {
     @Suppress("unused")
+    constructor() : this("", "")
     constructor(name: String) : this("", name)
 }

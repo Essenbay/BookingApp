@@ -56,16 +56,13 @@ class AccountSignUpFragment : Fragment() {
             signUpBtn.setOnClickListener {
                 val fullName = editSignupFullName.text.toString().trim()
                 val email = editSignupEmail.text.toString().trim()
-                val phoneNumber = editSignupPhoneNumber.text.toString().trim()
                 val password = editSingupPassword.text.toString().trim()
                 val confirmPassword = editSigUpConfirmPassword.text.toString().trim()
 
-                if (email.isBlank() || password.isBlank() || confirmPassword.isBlank() || fullName.isBlank() || phoneNumber.isBlank()) {
+                if (email.isBlank() || password.isBlank() || confirmPassword.isBlank() || fullName.isBlank()) {
                     Toast.makeText(context, "Fields must not be blank", Toast.LENGTH_LONG).show()
                 } else if (!checkLoginField(email)) {
                     Toast.makeText(context, "Email is not valid", Toast.LENGTH_LONG).show()
-                } else if (!checkPhoneNumberField(phoneNumber)) {
-                    Toast.makeText(context, "Phone number is not valid", Toast.LENGTH_LONG).show()
                 } else if (!checkPasswordMatching(password, confirmPassword)) {
                     Toast.makeText(context, "Passwords are not matching", Toast.LENGTH_LONG).show()
                 } else if (!checkPasswordField(password)) {
@@ -76,7 +73,7 @@ class AccountSignUpFragment : Fragment() {
                     ).show()
                 } else {
                     binding.progressCircular.visibility = View.VISIBLE
-                    register(fullName, email, phoneNumber, password, view)
+                    register(fullName, email, password, view)
                 }
             }
             toLogInLink.setOnClickListener {
@@ -88,34 +85,29 @@ class AccountSignUpFragment : Fragment() {
         }
     }
 
-    private fun register(
-        fullName: String,
-        email: String,
-        phoneNumber: String,
-        password: String,
-        view: View
-    ) = viewLifecycleOwner.lifecycleScope.launch {
-        binding.progressCircular.visibility = View.VISIBLE
-        when (val result = viewModel.register(fullName, email, phoneNumber, password)) {
-            is FirebaseResult.Success -> {
-                Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG)
-                    .show()
-                val action = AccountSignUpFragmentDirections.toAccount()
-                viewModel.userInputState.update {
-                    it.copy(passwordInput = "", emailInput = "")
+    private fun register(fullName: String, email: String, password: String, view: View) =
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressCircular.visibility = View.VISIBLE
+            when (val result = viewModel.register(fullName, email, password)) {
+                is FirebaseResult.Success -> {
+                    Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG)
+                        .show()
+                    val action = AccountSignUpFragmentDirections.toAccount()
+                    viewModel.userInputState.update {
+                        it.copy(passwordInput = "", emailInput = "")
+                    }
+                    view.findNavController().navigate(action)
                 }
-                view.findNavController().navigate(action)
-            }
-            is FirebaseResult.Error -> {
-                Toast.makeText(
-                    context,
-                    result.exception.localizedMessage ?: "Unknown error",
-                    Toast.LENGTH_LONG
-                ).show()
-                binding.progressCircular.visibility = View.INVISIBLE
+                is FirebaseResult.Error -> {
+                    Toast.makeText(
+                        context,
+                        result.exception.localizedMessage ?: "Unknown error",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.progressCircular.visibility = View.INVISIBLE
+                }
             }
         }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
