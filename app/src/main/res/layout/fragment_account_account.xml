@@ -14,8 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- Todo: Add profile image-->
-
     <TextView
         style="@style/TextAppearance.MaterialComponents.Headline5"
         android:id="@+id/username"
@@ -23,13 +21,6 @@
         android:layout_height="wrap_content"
         android:text="User name"
         />
-
-    <TextView
-        style="@style/TextAppearance.Material3.BodyMedium"
-        android:id="@+id/userEmail"
-        android:layout_width="wrap_content"
-        android:text="@string/user_email"
-        android:layout_height="wrap_content" />
 
     <!-- TODO: Add tab bar (favourite places, reviews, photos?) https://developer.android.com/guide/navigation/navigation-swipe-view -->
 

@@ -8,14 +8,15 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.bookingapp.databinding.FragmentAccountSignUpBinding
-import com.example.bookingapp.util.FirebaseResult
-import com.example.bookingapp.util.checkLoginField
-import com.example.bookingapp.util.checkPasswordField
-import com.example.bookingapp.util.checkPasswordMatching
-import com.example.bookingapp.viewmodels.AuthViewModel
+import com.example.bookingapp.util.*
+import com.example.bookingapp.viewmodels.AccountViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class AccountSignUpFragment : Fragment() {
     private var _binding: FragmentAccountSignUpBinding? = null
@@ -23,7 +24,7 @@ class AccountSignUpFragment : Fragment() {
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val viewModel: AuthViewModel by viewModels { AuthViewModel.Factory }
+    private val viewModel: AccountViewModel by viewModels { AccountViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,12 +52,14 @@ class AccountSignUpFragment : Fragment() {
                     it.copy(confirmPasswordInput = text.toString())
                 }
             }
+            //Todo: Add phone number formatter
             signUpBtn.setOnClickListener {
-                val email = editSignupEmail.text.toString()
-                val password = editSingupPassword.text.toString()
-                val confirmPassword = editSigUpConfirmPassword.text.toString()
+                val fullName = editSignupFullName.text.toString().trim()
+                val email = editSignupEmail.text.toString().trim()
+                val password = editSingupPassword.text.toString().trim()
+                val confirmPassword = editSigUpConfirmPassword.text.toString().trim()
 
-                if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                if (email.isBlank() || password.isBlank() || confirmPassword.isBlank() || fullName.isBlank()) {
                     Toast.makeText(context, "Fields must not be blank", Toast.LENGTH_LONG).show()
                 } else if (!checkLoginField(email)) {
                     Toast.makeText(context, "Email is not valid", Toast.LENGTH_LONG).show()
@@ -69,7 +72,8 @@ class AccountSignUpFragment : Fragment() {
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    register(email, password, view)
+                    binding.progressCircular.visibility = View.VISIBLE
+                    register(fullName, email, password, view)
                 }
             }
             toLogInLink.setOnClickListener {
@@ -81,31 +85,29 @@ class AccountSignUpFragment : Fragment() {
         }
     }
 
-    private fun register(email: String, password: String, view: View) {
-        viewModel.register(email, password).observe(viewLifecycleOwner) { firebaseResult ->
-            firebaseResult?.let { result ->
-                when (result) {
-                    is FirebaseResult.Success -> {
-                        Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG).show()
-                        val action = AccountSignUpFragmentDirections.toAccount()
-                        viewModel.userInputState.update {
-                            it.copy(passwordInput = "", emailInput = "")
-                        }
-                        view.findNavController().navigate(action)
+    private fun register(fullName: String, email: String, password: String, view: View) =
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.progressCircular.visibility = View.VISIBLE
+            when (val result = viewModel.register(fullName, email, password)) {
+                is FirebaseResult.Success -> {
+                    Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG)
+                        .show()
+                    val action = AccountSignUpFragmentDirections.toAccount()
+                    viewModel.userInputState.update {
+                        it.copy(passwordInput = "", emailInput = "")
                     }
-                    is FirebaseResult.Error -> {
-                        Toast.makeText(
-                            context,
-                            result.exception.localizedMessage ?: "Unknown error", Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    is FirebaseResult.Loading -> {
-                        Toast.makeText(context, "Loading...", Toast.LENGTH_LONG).show()
-                    }
+                    view.findNavController().navigate(action)
+                }
+                is FirebaseResult.Error -> {
+                    Toast.makeText(
+                        context,
+                        result.exception.localizedMessage ?: "Unknown error",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.progressCircular.visibility = View.INVISIBLE
                 }
             }
         }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

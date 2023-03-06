@@ -17,7 +17,7 @@ import com.example.bookingapp.viewmodels.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeHomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
@@ -65,9 +65,6 @@ class HomeFragment : Fragment() {
         when (result) {
             is SearchResult.Success -> {
                 var resultStr = "Establishments: \n"
-                val list = result.establishments
-                //Handle UI
-                //Recycle view
                 for (e in result.establishments) resultStr += e.name + '\n'
                 binding.establishments.text = resultStr
                 binding.emptyResultMsg.visibility = View.INVISIBLE
@@ -75,11 +72,18 @@ class HomeFragment : Fragment() {
             is SearchResult.Empty -> {
                 binding.establishments.text = ""
                 binding.emptyResultMsg.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Error -> {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
+                binding.progressBar.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
                 Log.d("HomeFragment", result.exception.toString())
+            }
+            is SearchResult.Loading -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.establishments.visibility = View.INVISIBLE
+                binding.emptyResultMsg.visibility = View.INVISIBLE
             }
         }
     }

@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">BookingApp</string>
-    <string name="user_label">User</string>
+
+    <!-- Home fragment -->
     <string name="home_label">Home</string>
+    <string name="empty_establishments_message">Nothing was found. Try changing the query.</string>
+
     <string name="reservations_label">Reservations</string>
 
+    <string name="user_label">User</string>
     <!-- User info: -->
     <string-array name="user_full_name">
         <item>Anonymous</item>
@@ -11,17 +15,30 @@
     </string-array>
     <string name="user_email">%1$</string>
 
-    <!-- Sign up / Login -->
+    <!-- Sign up / Login / Edit account-->
     <string name="login_label">Login</string>
     <string name="sign_up_label">Sign Up</string>
+    <string name="full_name_label">Full name</string>
+    <string name="full_name_hint">Enter your full name</string>
+    <string name="phone_number_label">Phone number</string>
+    <string name="phone_number_hint">Enter your phone number</string>
     <string name="email_label">Email</string>
     <string name="email_hint">Enter email</string>
     <string name="password_label">Password</string>
     <string name="password_hint">Enter Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
+    <string name="to_login_label">ALREADY HAVE AN ACCOUNT? LOGIN</string>
+    <string name="to_signup_label">NEW USER? SIGN UP</string>
+    <string name="edit_account_label">Edit your account</string>
+    <string name="close_edit_account_label">Cancel</string>
+    <string name="save_edit_account">Save changes</string>
+    <string name="delete_account">DELETE ACCOUNT</string>
 
     <!-- Account menu -->
-    <string name="edit_account_label">Edit account</string>
+    <string name="to_edit_account_label">Edit account</string>
     <string name="sign_out_label">Sign out</string>
+    <string name="menu_btn">Menu Button</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

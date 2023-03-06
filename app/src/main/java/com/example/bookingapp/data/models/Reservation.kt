@@ -2,6 +2,7 @@ package com.example.bookingapp.data.models
 
 import com.google.firebase.firestore.DocumentId
 
+//Todo: add date
 data class Reservation(
     @DocumentId
     val id: String,
@@ -12,4 +13,5 @@ data class Reservation(
 ) {
     @Suppress("unused")
     constructor() : this("", "", "")
+    constructor(establishmentId: String, userID: String) : this("", establishmentId, userID)
 }

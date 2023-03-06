@@ -15,6 +15,10 @@
         <action
             android:id="@+id/to_log_in"
             app:destination="@id/accountLogInFragment" />
+        <action
+            android:id="@+id/to_edit_account"
+            app:destination="@id/editAccountFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/accountLogInFragment"
@@ -36,5 +40,12 @@
             app:popUpToInclusive="true"
             app:destination="@id/accountAccountFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/editAccountFragment"
+        android:name="com.example.bookingapp.views.account.EditAccountFragment"
+        android:label="fragment_edit_account"
+        tools:layout="@layout/fragment_edit_account" />
+
 
 </navigation>
