@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentHomeBinding
+import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.viewmodels.HomeViewModel
 import com.example.bookingapp.viewmodels.SearchResult
 import com.google.android.material.snackbar.Snackbar
@@ -80,6 +81,9 @@ class HomeHomeFragment : Fragment() {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
                 Log.d("HomeFragment", result.exception.toString())
+            }
+            is SearchResult.Loading -> {
+                
             }
         }
     }

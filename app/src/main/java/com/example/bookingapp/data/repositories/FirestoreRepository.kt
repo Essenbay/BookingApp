@@ -1,4 +1,4 @@
-package com.example.bookingapp.data.sources
+package com.example.bookingapp.data.repositories
 
 import android.util.Log
 import com.example.bookingapp.data.models.Establishment
@@ -17,7 +17,7 @@ const val RESERVATION_COLLECTION = "reservations"
 const val ESTABLISHMENT_COLLECTION = "establishments"
 
 
-class FirestoreSource {
+class FirestoreRepository {
     private val db: FirebaseFirestore = Firebase.firestore
 
     suspend fun createUser(
@@ -67,6 +67,19 @@ class FirestoreSource {
 
     suspend fun getReservations(userID: String): FirebaseResult<List<Reservation>> {
         TODO("Not yet implemented")
+    }
+
+    suspend fun createReservation(
+        establishmentID: String,
+        userID: String,
+    ): FirebaseResult<Boolean> = suspendCoroutine { cont ->
+        val newReservation = Reservation(establishmentID, userID)
+        db.collection((ESTABLISHMENT_COLLECTION)).add(newReservation).addOnSuccessListener {
+            cont.resume(FirebaseResult.Success(true))
+        }
+            .addOnFailureListener {
+                cont.resume(FirebaseResult.Error(it))
+            }
     }
 
     suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
