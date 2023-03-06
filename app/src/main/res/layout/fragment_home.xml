@@ -19,7 +19,7 @@
         android:id="@+id/establishments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_establishments_view"/>
+        android:layout_below="@id/search_establishments_view" />
 
     <TextView
         android:id="@+id/empty_result_msg"
@@ -30,5 +30,11 @@
         android:text="@string/empty_establishments_message"
         android:textAlignment="center"
         android:visibility="invisible" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_establishments_view"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
