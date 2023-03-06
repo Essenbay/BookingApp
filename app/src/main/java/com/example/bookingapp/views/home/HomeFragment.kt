@@ -12,8 +12,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.bookingapp.databinding.FragmentHomeBinding
+import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.viewmodels.HomeViewModel
-import com.example.bookingapp.viewmodels.SearchResult
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 

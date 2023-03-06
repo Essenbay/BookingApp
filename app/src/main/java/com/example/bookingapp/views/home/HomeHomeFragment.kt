@@ -11,13 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentHomeBinding
 import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.viewmodels.HomeViewModel
-import com.example.bookingapp.viewmodels.SearchResult
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
@@ -76,14 +72,18 @@ class HomeHomeFragment : Fragment() {
             is SearchResult.Empty -> {
                 binding.establishments.text = ""
                 binding.emptyResultMsg.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Error -> {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
+                binding.progressBar.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
                 Log.d("HomeFragment", result.exception.toString())
             }
             is SearchResult.Loading -> {
-                
+                binding.progressBar.visibility = View.VISIBLE
+                binding.establishments.visibility = View.INVISIBLE
+                binding.emptyResultMsg.visibility = View.INVISIBLE
             }
         }
     }
