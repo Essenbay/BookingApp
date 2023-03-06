@@ -37,5 +37,8 @@
     <!-- Account menu -->
     <string name="to_edit_account_label">Edit account</string>
     <string name="sign_out_label">Sign out</string>
+    <string name="menu_btn">Menu Button</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

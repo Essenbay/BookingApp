@@ -10,4 +10,5 @@ class EstablishmentRepository(
 ) {
 
     suspend fun getEstablishments(): FirebaseResult<List<Establishment>> = firestoreSource.getEstablishments()
+
 }

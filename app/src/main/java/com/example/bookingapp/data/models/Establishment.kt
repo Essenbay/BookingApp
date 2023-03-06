@@ -6,9 +6,19 @@ import com.google.firebase.firestore.DocumentId
 data class Establishment(
     @DocumentId
     val establishmentId: String,
-    val name: String
+    val name: String,
+    val description: String,
+    val address: String,
+    val workingTime: String,
+    val phoneNumbers: List<String>,
 ) {
     @Suppress("unused")
-    constructor() : this("", "")
-    constructor(name: String) : this("", name)
+    constructor() : this("", "", "", "", "", listOf())
+    constructor(
+        name: String,
+        description: String,
+        address: String,
+        workingTime: String,
+        phoneNumbers: List<String>
+    ) : this("", name, description, address, workingTime, phoneNumbers)
 }

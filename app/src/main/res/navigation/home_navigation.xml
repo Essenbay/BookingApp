@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_navigation"
+    app:startDestination="@id/homeFragment2">
+
+    <fragment
+        android:id="@+id/homeFragment2"
+        android:name="com.example.bookingapp.views.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/to_add_establishment"
+            app:destination="@id/fragment_home_add_establishment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_home_add_establishment"
+        android:name="com.example.bookingapp.fragment_home_add_establishment"
+        android:label="fragment_home_add_establishment"
+        tools:layout="@layout/fragment_home_add_establishment" />
+</navigation>

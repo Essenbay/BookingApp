@@ -19,6 +19,8 @@ const val ESTABLISHMENT_COLLECTION = "establishments"
 
 class FirestoreSource {
     private val db: FirebaseFirestore = Firebase.firestore
+
+
     suspend fun createUser(
         firebaseUserUid: String,
         fullName: String,
@@ -67,6 +69,25 @@ class FirestoreSource {
     suspend fun getReservations(userID: String): FirebaseResult<List<Reservation>> {
         TODO("Not yet implemented")
     }
+
+    suspend fun addEstablishment(
+        name: String,
+        description: String,
+        address: String,
+        workingTime: String,
+        phoneNumbers: List<String>
+    ): FirebaseResult<Boolean> = suspendCoroutine { cont ->
+        val newEstablishment = Establishment(name, description, address, workingTime, phoneNumbers)
+        val result = db.collection(ESTABLISHMENT_COLLECTION).document().set(newEstablishment)
+        result.addOnSuccessListener {
+            cont.resume(FirebaseResult.Success(true))
+        }
+            .addOnFailureListener {
+                cont.resume(FirebaseResult.Error(it))
+            }
+    }
+
+    //Working with establishments
 
     suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
         suspendCoroutine { cont ->
