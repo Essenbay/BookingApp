@@ -7,8 +7,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.repositories.EstablishmentRepository
+import com.example.bookingapp.data.repositories.FirestoreRepository
 import com.example.bookingapp.util.FirebaseResult
+import com.example.bookingapp.util.SearchResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,23 +17,17 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-sealed class SearchResult {
-    object Empty : SearchResult()
-    data class Error(val exception: Exception) : SearchResult()
-    data class Success(val establishments: List<Establishment>) : SearchResult()
-}
-
-class HomeViewModel(private val firebaseEstablishmentRepository: EstablishmentRepository) :
+class HomeViewModel(private val firestoreRepository: FirestoreRepository) :
     ViewModel() {
     private var _firestoreEstablishments: List<Establishment> = emptyList()
     private var _filteredEstablishments: MutableStateFlow<SearchResult> =
-        MutableStateFlow(SearchResult.Empty)
+        MutableStateFlow(SearchResult.Loading)
     val filteredEstablishments = _filteredEstablishments.asStateFlow()
 
 
     init {
         viewModelScope.launch {
-            when (val result = firebaseEstablishmentRepository.getEstablishments()) {
+            when (val result = firestoreRepository.getEstablishments()) {
                 is FirebaseResult.Success -> {
                     _firestoreEstablishments = result.data
                     searchEstablishments("")
@@ -47,27 +42,29 @@ class HomeViewModel(private val firebaseEstablishmentRepository: EstablishmentRe
     suspend fun searchEstablishments(query: String?) {
         _filteredEstablishments.update { startSearchEstablishments(query) }
     }
-    private suspend fun startSearchEstablishments(query: String?): SearchResult = suspendCoroutine { cont ->
-        if (query == null || query.isBlank()) cont.resume(
-            SearchResult.Success(_firestoreEstablishments)
-        )
-        else {
-            val resultList = mutableListOf<Establishment>()
-            for (e in _firestoreEstablishments) {
-                if (e.name.lowercase().contains(query.lowercase())) resultList.add(e)
+
+    private suspend fun startSearchEstablishments(query: String?): SearchResult =
+        suspendCoroutine { cont ->
+            if (query == null || query.isBlank()) cont.resume(
+                SearchResult.Success(_firestoreEstablishments)
+            )
+            else {
+                val resultList = mutableListOf<Establishment>()
+                for (e in _firestoreEstablishments) {
+                    if (e.name.lowercase().contains(query.lowercase())) resultList.add(e)
+                }
+                if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
+                else cont.resume(SearchResult.Success(resultList))
             }
-            if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
-            else cont.resume(SearchResult.Success(resultList))
         }
-    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookingApplication)
-                val establishmentRepository = application.container.establishmentRepository
-                HomeViewModel(establishmentRepository)
+                val firestoreRepository = application.container.firestoreRepository
+                HomeViewModel(firestoreRepository)
             }
         }
     }
