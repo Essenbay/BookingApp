@@ -65,6 +65,9 @@ class HomeFragment : Fragment() {
         when (result) {
             is SearchResult.Success -> {
                 var resultStr = "Establishments: \n"
+                val list = result.establishments
+                //Handle UI
+                //Recycle view
                 for (e in result.establishments) resultStr += e.name + '\n'
                 binding.establishments.text = resultStr
                 binding.emptyResultMsg.visibility = View.INVISIBLE

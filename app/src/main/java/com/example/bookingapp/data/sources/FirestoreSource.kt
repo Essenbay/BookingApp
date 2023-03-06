@@ -19,6 +19,7 @@ const val ESTABLISHMENT_COLLECTION = "establishments"
 
 class FirestoreSource {
     private val db: FirebaseFirestore = Firebase.firestore
+
     suspend fun createUser(
         firebaseUserUid: String,
         fullName: String,
