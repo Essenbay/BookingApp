@@ -4,10 +4,10 @@ import com.example.bookingapp.data.repositories.FirebaseUserRepository
 import com.example.bookingapp.data.repositories.FirestoreRepository
 
 class AppContainer {
-    val firebaseUserRepository by lazy {
+    val userRepository by lazy {
         FirebaseUserRepository()
     }
-    val firestoreRepository by lazy {
+    val storageRepository by lazy {
         FirestoreRepository()
     }
 }

@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_home_add_establishment"
-        android:name="com.example.bookingapp.fragment_home_add_establishment"
+        android:name="com.example.bookingapp.views.home.HomeAddEstablishmentFragment"
         android:label="fragment_home_add_establishment"
         tools:layout="@layout/fragment_home_add_establishment" />
 </navigation>

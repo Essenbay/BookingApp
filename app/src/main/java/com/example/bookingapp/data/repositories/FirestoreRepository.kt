@@ -16,11 +16,26 @@ const val USER_COLLECTION = "users"
 const val RESERVATION_COLLECTION = "reservations"
 const val ESTABLISHMENT_COLLECTION = "establishments"
 
+interface StoreRepository {
+    suspend fun createUser(
+        firebaseUserUid: String,
+        fullName: String,
+        phoneNumber: String
+    ) : FirebaseResult<User>
 
-class FirestoreRepository {
+    suspend fun getUser(userID: String): User
+
+    suspend fun createReservation(
+        establishmentID: String,
+        userID: String,
+    ) : FirebaseResult<Boolean>
+
+    suspend fun getEstablishments(): FirebaseResult<List<Establishment>>
+}
+class FirestoreRepository : StoreRepository {
     private val db: FirebaseFirestore = Firebase.firestore
 
-    suspend fun createUser(
+    override suspend fun createUser(
         firebaseUserUid: String,
         fullName: String,
         phoneNumber: String
@@ -34,7 +49,7 @@ class FirestoreRepository {
             }
     }
 
-    suspend fun getUser(userID: String): User = suspendCoroutine { cont ->
+    override suspend fun getUser(userID: String): User = suspendCoroutine { cont ->
         val docRef = db.collection(USER_COLLECTION).document(userID)
         docRef.get()
             .addOnSuccessListener {
@@ -69,7 +84,7 @@ class FirestoreRepository {
         TODO("Not yet implemented")
     }
 
-    suspend fun createReservation(
+    override suspend fun createReservation(
         establishmentID: String,
         userID: String,
     ): FirebaseResult<Boolean> = suspendCoroutine { cont ->
@@ -82,7 +97,7 @@ class FirestoreRepository {
             }
     }
 
-    suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
+    override suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
         suspendCoroutine { cont ->
             val snapshot = db.collection(ESTABLISHMENT_COLLECTION).get()
             val establishments: MutableList<Establishment> = mutableListOf()
