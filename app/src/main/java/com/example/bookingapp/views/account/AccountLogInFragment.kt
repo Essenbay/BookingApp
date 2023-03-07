@@ -39,16 +39,16 @@ class AccountLogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            editLoginEmail.doOnTextChanged { text, _, _, _ ->
-                viewModel.userInputState.update {
-                    it.copy(emailInput = text.toString())
-                }
-            }
-            editLoginPassword.doOnTextChanged { text, _, _, _ ->
-                viewModel.userInputState.update {
-                    it.copy(passwordInput = text.toString())
-                }
-            }
+//            editLoginEmail.doOnTextChanged { text, _, _, _ ->
+//                viewModel.userInputState.update {
+//                    it.copy(emailInput = text.toString())
+//                }
+//            }
+//            editLoginPassword.doOnTextChanged { text, _, _, _ ->
+//                viewModel.userInputState.update {
+//                    it.copy(passwordInput = text.toString())
+//                }
+//            }
 
             loginBtn.setOnClickListener {
                 val email = editLoginEmail.text.toString()
@@ -71,9 +71,9 @@ class AccountLogInFragment : Fragment() {
             toSignupBtn.setOnClickListener {
                 Log.d("Login fragment", "on register")
                 val action = AccountLogInFragmentDirections.logInToSignUp()
-                viewModel.userInputState.update {
-                    it.copy(passwordInput = "", emailInput = "")
-                }
+//                viewModel.userInputState.update {
+//                    it.copy(passwordInput = "", emailInput = "")
+//                }
                 view.findNavController().navigate(action)
             }
         }

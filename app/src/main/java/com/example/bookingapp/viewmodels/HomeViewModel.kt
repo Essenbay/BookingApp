@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.repositories.FirestoreRepository
+import com.example.bookingapp.data.repositories.StoreRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class HomeViewModel(private val firestoreRepository: FirestoreRepository) :
+class HomeViewModel(private val storeRepository: StoreRepository) :
     ViewModel() {
     private var _firestoreEstablishments: List<Establishment> = emptyList()
     private var _filteredEstablishments: MutableStateFlow<SearchResult> =
@@ -27,7 +27,7 @@ class HomeViewModel(private val firestoreRepository: FirestoreRepository) :
 
     init {
         viewModelScope.launch {
-            when (val result = firestoreRepository.getEstablishments()) {
+            when (val result = storeRepository.getEstablishments()) {
                 is FirebaseResult.Success -> {
                     _firestoreEstablishments = result.data
                     searchEstablishments("")
@@ -63,7 +63,7 @@ class HomeViewModel(private val firestoreRepository: FirestoreRepository) :
             initializer {
                 val application =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookingApplication)
-                val firestoreRepository = application.container.firestoreRepository
+                val firestoreRepository = application.container.storageRepository
                 HomeViewModel(firestoreRepository)
             }
         }

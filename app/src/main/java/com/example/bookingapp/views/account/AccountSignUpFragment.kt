@@ -37,21 +37,21 @@ class AccountSignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            editSignupEmail.doOnTextChanged { text, _, _, _ ->
-                viewModel.userInputState.update {
-                    it.copy(emailInput = text.toString())
-                }
-            }
-            editSingupPassword.doOnTextChanged { text, _, _, _ ->
-                viewModel.userInputState.update {
-                    it.copy(passwordInput = text.toString())
-                }
-            }
-            editSigUpConfirmPassword.doOnTextChanged { text, _, _, _ ->
-                viewModel.userInputState.update {
-                    it.copy(confirmPasswordInput = text.toString())
-                }
-            }
+//            editSignupEmail.doOnTextChanged { text, _, _, _ ->
+//                viewModel.userInputState.update {
+//                    it.copy(emailInput = text.toString())
+//                }
+//            }
+//            editSingupPassword.doOnTextChanged { text, _, _, _ ->
+//                viewModel.userInputState.update {
+//                    it.copy(passwordInput = text.toString())
+//                }
+//            }
+//            editSigUpConfirmPassword.doOnTextChanged { text, _, _, _ ->
+//                viewModel.userInputState.update {
+//                    it.copy(confirmPasswordInput = text.toString())
+//                }
+//            }
             //Todo: Add phone number formatter
             signUpBtn.setOnClickListener {
                 val fullName = editSignupFullName.text.toString().trim()
@@ -77,9 +77,9 @@ class AccountSignUpFragment : Fragment() {
                 }
             }
             toLogInLink.setOnClickListener {
-                viewModel.userInputState.update {
-                    it.copy(passwordInput = "", confirmPasswordInput = "")
-                }
+//                viewModel.userInputState.update {
+//                    it.copy(passwordInput = "", confirmPasswordInput = "")
+//                }
                 view.findNavController().navigateUp()
             }
         }
@@ -93,9 +93,9 @@ class AccountSignUpFragment : Fragment() {
                     Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG)
                         .show()
                     val action = AccountSignUpFragmentDirections.toAccount()
-                    viewModel.userInputState.update {
-                        it.copy(passwordInput = "", emailInput = "")
-                    }
+//                    viewModel.userInputState.update {
+//                        it.copy(passwordInput = "", emailInput = "")
+//                    }
                     view.findNavController().navigate(action)
                 }
                 is FirebaseResult.Error -> {

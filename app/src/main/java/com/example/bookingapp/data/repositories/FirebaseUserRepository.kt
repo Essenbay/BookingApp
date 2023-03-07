@@ -9,17 +9,30 @@ import kotlinx.coroutines.flow.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseUserRepository() {
+interface UserRepository {
+
+    val user: StateFlow<FirebaseUser?>
+    suspend fun register(
+        email: String,
+        password: String,
+        fullName: String
+    ): FirebaseResult<Boolean>
+
+    suspend fun login(email: String, password: String): FirebaseResult<Boolean>
+
+    fun signOut()
+}
+
+class FirebaseUserRepository() : UserRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var _user: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
-    val user: StateFlow<FirebaseUser?> = _user.asStateFlow()
-    fun getAuthCurrentUser(): FirebaseUser? = auth.currentUser
+    override val user: StateFlow<FirebaseUser?> = _user.asStateFlow()
 
     init {
         auth.currentUser?.reload()
     }
 
-    suspend fun register(
+    override suspend fun register(
         email: String,
         password: String,
         fullName: String
@@ -40,7 +53,7 @@ class FirebaseUserRepository() {
                 }
         }
 
-    suspend fun login(email: String, password: String): FirebaseResult<Boolean> =
+    override suspend fun login(email: String, password: String): FirebaseResult<Boolean> =
         suspendCoroutine { cont ->
             auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
@@ -53,7 +66,7 @@ class FirebaseUserRepository() {
                 }
         }
 
-    fun signOut() {
+    override fun signOut() {
         auth.signOut()
         _user.update {
             auth.currentUser
