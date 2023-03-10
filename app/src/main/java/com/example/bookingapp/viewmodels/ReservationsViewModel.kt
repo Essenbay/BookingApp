@@ -6,15 +6,18 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Reservation
-import com.example.bookingapp.data.repositories.StoreRepository
+import com.example.bookingapp.data.repositories.ReceiveReservations
 import com.example.bookingapp.util.SearchResult
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
-class ReservationsViewModel(storeRepository: StoreRepository) : ViewModel() {
+class ReservationsViewModel(storeRepository: ReceiveReservations) : ViewModel() {
     private var _reservations: MutableStateFlow<List<Reservation>> = MutableStateFlow(emptyList())
     private var _filteredReservations: MutableStateFlow<SearchResult> =
         MutableStateFlow(SearchResult.Loading)
+
+
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

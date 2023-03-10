@@ -1,8 +1,8 @@
-package com.example.bookingapp.data.repositories
+package com.example.bookingapp.data.datasource
 
 import android.util.Log
+import com.example.bookingapp.data.repositories.UserRepository
 import com.example.bookingapp.util.FirebaseResult
-import com.google.firebase.auth.EmailAuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -11,31 +11,6 @@ import kotlinx.coroutines.flow.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-interface UserRepository {
-
-    val user: StateFlow<FirebaseUser?>
-    suspend fun register(
-        email: String,
-        password: String,
-        fullName: String
-    ): FirebaseResult<Boolean>
-
-    suspend fun editUserInfo(
-        fullName: String
-    ): FirebaseResult<Boolean>
-
-    suspend fun editUserEmail(
-        password: String, newEmail: String
-    ): FirebaseResult<Boolean>
-
-    suspend fun editUserPassword(
-        password: String, newPassword: String
-    ): FirebaseResult<Boolean>
-
-    suspend fun login(email: String, password: String): FirebaseResult<Boolean>
-
-    fun signOut()
-}
 
 class FirebaseUserRepository() : UserRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()

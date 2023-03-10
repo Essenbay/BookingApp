@@ -1,7 +1,6 @@
 package com.example.bookingapp.util
 
 import android.util.Patterns
-import java.util.regex.Pattern
 
 fun checkLoginField(emailInput: String): Boolean {
     var isValid = true

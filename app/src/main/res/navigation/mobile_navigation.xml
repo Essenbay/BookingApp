@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.bookingapp.views.home.HomeHomeFragment"
+        android:name="com.example.bookingapp.views.home.HomeContainerFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home_container" />
     <fragment
         android:id="@+id/reservationHistoryFragment"
         android:name="com.example.bookingapp.views.reservationhistory.ReservationHistoryFragment"

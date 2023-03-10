@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.repositories.StoreRepository
+import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class HomeViewModel(private val storeRepository: StoreRepository) :
+class HomeViewModel(private val establishmentsRepository: EstablishmentsRepository) :
     ViewModel() {
     private var _firestoreEstablishments: List<Establishment> = emptyList()
     private var _filteredEstablishments: MutableStateFlow<SearchResult> =
@@ -27,7 +27,7 @@ class HomeViewModel(private val storeRepository: StoreRepository) :
 
     init {
         viewModelScope.launch {
-            when (val result = storeRepository.getEstablishments()) {
+            when (val result = establishmentsRepository.getEstablishments()) {
                 is FirebaseResult.Success -> {
                     _firestoreEstablishments = result.data
                     searchEstablishments("")
@@ -57,6 +57,8 @@ class HomeViewModel(private val storeRepository: StoreRepository) :
                 else cont.resume(SearchResult.Success(resultList))
             }
         }
+
+    suspend fun addEstablishment(newEstablishment: Establishment):FirebaseResult<Boolean> = establishmentsRepository.createEstablishment(newEstablishment)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
