@@ -13,17 +13,15 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-
-//data class AuthInputState(
-//    val emailInput: String = "",
-//    val passwordInput: String = ""
-//)
 
 class AccountViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
-//    val userInputState: MutableStateFlow<AuthInputState> = MutableStateFlow(AuthInputState())
     val user: StateFlow<FirebaseUser?> = userRepository.user
+    private val _isUserVerified: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isUserVerified: StateFlow<Boolean> = _isUserVerified.asStateFlow()
+
 
     suspend fun register(
         fullName: String,
@@ -40,7 +38,17 @@ class AccountViewModel(private val userRepository: UserRepository) : ViewModel()
 
     fun signOut() = userRepository.signOut()
 
-//    fun deleteAccount(): LiveData<FirebaseResult<Boolean>> = firebaseUserRepository.deleteUser()
+    suspend fun editUserInfo(fullName: String) = userRepository.editUserInfo(fullName)
+
+    suspend fun editUserEmail(
+        password: String,
+        newEmail: String
+    ) = userRepository.editUserEmail(password, newEmail)
+
+    suspend fun editUserPassword(
+        password: String,
+        newPassword: String
+    ) = userRepository.editUserPassword(password, newPassword)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

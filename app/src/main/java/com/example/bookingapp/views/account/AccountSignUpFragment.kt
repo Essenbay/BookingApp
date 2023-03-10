@@ -93,9 +93,6 @@ class AccountSignUpFragment : Fragment() {
                     Toast.makeText(context, "Successfully registered", Toast.LENGTH_LONG)
                         .show()
                     val action = AccountSignUpFragmentDirections.toAccount()
-//                    viewModel.userInputState.update {
-//                        it.copy(passwordInput = "", emailInput = "")
-//                    }
                     view.findNavController().navigate(action)
                 }
                 is FirebaseResult.Error -> {

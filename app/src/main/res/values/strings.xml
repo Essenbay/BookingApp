@@ -30,6 +30,11 @@
     <string name="to_login_label">ALREADY HAVE AN ACCOUNT? LOGIN</string>
     <string name="to_signup_label">NEW USER? SIGN UP</string>
     <string name="edit_account_label">Edit your account</string>
+    <string name="edit_profile_label">Edit profile</string>
+    <string name="new_email_label">New Email</string>
+    <string name="new_email_hint">Enter new email</string>
+    <string name="edit_email_label">Edit email address</string>
+    <string name="edit_password_label">Edit password</string>
     <string name="close_edit_account_label">Cancel</string>
     <string name="save_edit_account">Save changes</string>
     <string name="delete_account">DELETE ACCOUNT</string>
