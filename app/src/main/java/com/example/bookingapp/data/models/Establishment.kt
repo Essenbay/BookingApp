@@ -1,6 +1,8 @@
 package com.example.bookingapp.data.models
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import java.time.LocalTime
 
 //Todo: Add places list
 data class Establishment(
@@ -9,16 +11,18 @@ data class Establishment(
     val name: String,
     val description: String,
     val address: String,
-    val workingTime: String,
-    val phoneNumbers: List<String>,
+    val workingTimeStart: Timestamp,
+    val workingTimeEnd: Timestamp,
+    val phoneNumbers: String,
 ) {
     @Suppress("unused")
-    constructor() : this("", "", "", "", "", listOf())
+    constructor() : this("", "", "", "", Timestamp(0, 0), Timestamp(0, 0), "")
     constructor(
         name: String,
         description: String,
         address: String,
-        workingTime: String,
-        phoneNumbers: List<String>
-    ) : this("", name, description, address, workingTime, phoneNumbers)
+        workingTimeStart: Timestamp,
+        workingTimeEnd: Timestamp,
+        phoneNumber: String
+    ) : this("", name, description, address, workingTimeStart, workingTimeEnd, phoneNumber)
 }

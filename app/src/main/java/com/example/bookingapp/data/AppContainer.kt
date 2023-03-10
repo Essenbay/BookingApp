@@ -1,7 +1,7 @@
 package com.example.bookingapp.data
 
-import com.example.bookingapp.data.repositories.FirebaseUserRepository
-import com.example.bookingapp.data.repositories.FirestoreRepository
+import com.example.bookingapp.data.datasource.FirebaseUserRepository
+import com.example.bookingapp.data.datasource.FirestoreRepository
 
 class AppContainer {
     val userRepository by lazy {
