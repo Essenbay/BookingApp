@@ -39,17 +39,6 @@ class AccountLogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-//            editLoginEmail.doOnTextChanged { text, _, _, _ ->
-//                viewModel.userInputState.update {
-//                    it.copy(emailInput = text.toString())
-//                }
-//            }
-//            editLoginPassword.doOnTextChanged { text, _, _, _ ->
-//                viewModel.userInputState.update {
-//                    it.copy(passwordInput = text.toString())
-//                }
-//            }
-
             loginBtn.setOnClickListener {
                 val email = editLoginEmail.text.toString()
                 val password = editLoginPassword.text.toString()

@@ -2,15 +2,15 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/auth_navigation"
     app:startDestination="@id/accountAccountFragment"
-    tools:viewBindingIgnore="true"
-    android:id="@+id/auth_navigation">
+    tools:viewBindingIgnore="true">
 
     <fragment
         android:id="@+id/accountAccountFragment"
         android:name="com.example.bookingapp.views.account.AccountAccountFragment"
         android:label="fragment_account_account"
-        tools:layout="@layout/fragment_account_account" >
+        tools:layout="@layout/fragment_account_account">
 
         <action
             android:id="@+id/to_log_in"
@@ -33,19 +33,43 @@
         android:id="@+id/accountSignUpFragment"
         android:name="com.example.bookingapp.views.account.AccountSignUpFragment"
         android:label="AccountSignUpFragment"
-        tools:layout="@layout/fragment_account_sign_up">
-        <action
-            android:id="@+id/toAccount"
-            app:popUpTo="@id/accountAccountFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/accountAccountFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_account_sign_up" />
 
     <fragment
         android:id="@+id/editAccountFragment"
         android:name="com.example.bookingapp.views.account.EditAccountFragment"
         android:label="fragment_edit_account"
-        tools:layout="@layout/fragment_edit_account" />
+        tools:layout="@layout/fragment_edit_account">
+        <action
+            android:id="@+id/to_edit_user_info"
+            app:destination="@id/editUserInfoFragment" />
+        <action
+            android:id="@+id/to_edit_email"
+            app:destination="@id/editEmailFragment" />
+        <action
+            android:id="@+id/to_edit_password"
+            app:destination="@id/editUserPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editUserInfoFragment"
+        android:name="com.example.bookingapp.views.account.EditUserInfoFragment"
+        android:label="EditUserInfoFragment" />
+
+    <action
+        android:id="@+id/toAccount"
+        app:destination="@id/accountAccountFragment"
+        app:popUpTo="@id/accountAccountFragment"
+        app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/editEmailFragment"
+        android:name="com.example.bookingapp.views.account.EditEmailFragment"
+        android:label="fragment_edit_user_email"
+        tools:layout="@layout/fragment_edit_user_email" />
+    <fragment
+        android:id="@+id/editUserPasswordFragment"
+        android:name="com.example.bookingapp.views.account.EditUserPasswordFragment"
+        android:label="fragment_edit_user_password"
+        tools:layout="@layout/fragment_edit_user_password" />
 
 
 </navigation>

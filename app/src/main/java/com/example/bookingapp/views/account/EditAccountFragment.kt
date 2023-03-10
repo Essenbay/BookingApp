@@ -31,26 +31,16 @@ class EditAccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.editAccountToolbar.inflateMenu(R.menu.edit_account_menu)
-        binding.editAccountToolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.cancel_changes -> {
-                    Log.d("EditAccountFragment", "On cancel")
-                    view.findNavController().navigateUp()
-
-                    true
-                }
-                else -> false
-            }
+        binding.toEditProfileBtn.setOnClickListener {
+            view.findNavController()
+                .navigate(EditAccountFragmentDirections.toEditUserInfo())
         }
-
-        binding.saveAccountChangesBtn.setOnClickListener {
-            Log.d("EditAccountFragment", "On save")
-            view.findNavController().navigateUp()
+        binding.toEditEmailBtn.setOnClickListener {
+            view.findNavController().navigate(EditAccountFragmentDirections.toEditEmail())
         }
-        //Todo: add editing of account function
-
-        //Todo: add deletion of account function
+        binding.toEditPasswordBtn.setOnClickListener {
+            view.findNavController().navigate(EditAccountFragmentDirections.toEditPassword())
+        }
     }
 
     override fun onDestroy() {
