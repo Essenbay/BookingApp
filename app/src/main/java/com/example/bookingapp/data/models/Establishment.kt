@@ -14,15 +14,26 @@ data class Establishment(
     val workingTimeStart: Timestamp,
     val workingTimeEnd: Timestamp,
     val phoneNumbers: String,
+    val tableNumber: Int
 ) {
     @Suppress("unused")
-    constructor() : this("", "", "", "", Timestamp(0, 0), Timestamp(0, 0), "")
+    constructor() : this("", "", "", "", Timestamp(0, 0), Timestamp(0, 0), "", 0)
     constructor(
         name: String,
         description: String,
         address: String,
         workingTimeStart: Timestamp,
         workingTimeEnd: Timestamp,
-        phoneNumber: String
-    ) : this("", name, description, address, workingTimeStart, workingTimeEnd, phoneNumber)
+        phoneNumber: String,
+        tableNumber: Int
+    ) : this(
+        "",
+        name,
+        description,
+        address,
+        workingTimeStart,
+        workingTimeEnd,
+        phoneNumber,
+        tableNumber
+    )
 }

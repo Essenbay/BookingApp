@@ -113,6 +113,20 @@
             android:layout_height="wrap_content"
             android:hint="Phone number"
             android:inputType="phone" />
+
+        <TextView
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Number of tables"
+            android:textColor="@color/blue_400" />
+
+        <EditText
+            android:id="@+id/edit_tables_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Number of tables"
+            android:inputType="numberDecimal" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,23 +6,21 @@ import com.google.firebase.firestore.DocumentId
 data class Reservation(
     @DocumentId
     val id: String,
-    @DocumentId
     val userID: String,
-    @DocumentId
     val establishmentId: String,
-    val tableID: String,
+    val tableID: Int,
     val dateTime: Timestamp
 ) {
     @Suppress("unused")
     constructor() : this(
-        "", "", "", "",
+        "", "", "", 0,
         Timestamp(0, 0)
     )
 
     constructor(
         establishmentId: String,
         userID: String,
-        tableID: String,
+        tableID: Int,
         dateTime: Timestamp
     ) : this(
         "",

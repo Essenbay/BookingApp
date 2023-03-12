@@ -8,18 +8,8 @@
         app:showAsAction="ifRoom"
         android:title="Search"/>
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/baseline_settings_24"
-        app:showAsAction="never"
-        android:title="Settings" />
-    <item
-        android:id="@+id/add_establishment"
-        android:icon="@drawable/baseline_add_home_work_24"
-        app:showAsAction="never"
-        android:title="Add establishment" />
-    <item
-        android:id="@+id/update_establishment_list"
+        android:id="@+id/update_reservation_list"
         android:icon="@drawable/baseline_autorenew_24"
         app:showAsAction="never"
-        android:title="Update establishment list" />
+        android:title="Update reservations list" />
 </menu>

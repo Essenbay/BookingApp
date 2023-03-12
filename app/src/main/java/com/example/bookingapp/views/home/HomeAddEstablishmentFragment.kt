@@ -53,6 +53,7 @@ class HomeAddEstablishmentFragment : Fragment() {
         binding.editTitle.setText("Cafe")
         binding.editDescription.setText("The place for you")
         binding.editAddress.setText("Almaty")
+        binding.editTablesNumber.setText("3")
 
         binding.addEstablishmentToolbar.inflateMenu(R.menu.add_establishment_menu)
         binding.addEstablishmentToolbar.setOnMenuItemClickListener {
@@ -83,7 +84,8 @@ class HomeAddEstablishmentFragment : Fragment() {
             val listener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                 val time = LocalTime.of(hourOfDay, minute)
                 workingTimeEnd = Timestamp(time.toSecondOfDay().toLong(), 0)
-                it.setText(time.toString())            }
+                it.setText(time.toString())
+            }
             val initialTime = LocalTime.MIDNIGHT
             TimePickerDialog(
                 context, listener, initialTime.hour, initialTime.minute, true
@@ -93,15 +95,19 @@ class HomeAddEstablishmentFragment : Fragment() {
 
     private fun createEstablishment() {
         try {
-            val title = binding.editTitle.text.toString()
-            val description = binding.editDescription.text.toString()
-            val address = binding.editAddress.text.toString()
-            val phoneNumber = binding.editPhoneNumber.text.toString()
+            val title = binding.editTitle.text.toString().trim()
+            val description = binding.editDescription.text.toString().trim()
+            val address = binding.editAddress.text.toString().trim()
+            val phoneNumber = binding.editPhoneNumber.text.toString().trim()
+            val tableNum = binding.editTablesNumber.text.toString().trim().toInt()
 
             if (title.isBlank() || description.isBlank() || address.isBlank() || phoneNumber.isBlank() || !this::workingTimeStart.isInitialized || !this::workingTimeEnd.isInitialized)
                 Toast.makeText(context, "Fields must not be blank", Toast.LENGTH_LONG).show()
             else if (!checkPhoneNumberField(phoneNumber))
                 Toast.makeText(context, "Phone number is badly formatted", Toast.LENGTH_LONG).show()
+            else if(tableNum <= 0) {
+                Toast.makeText(context, "Number of tables must be positive number", Toast.LENGTH_LONG).show()
+            }
             else {
                 val newEstablishment = Establishment(
                     title,
@@ -109,12 +115,15 @@ class HomeAddEstablishmentFragment : Fragment() {
                     address,
                     workingTimeStart,
                     workingTimeEnd,
-                    phoneNumber
+                    phoneNumber,
+                    tableNum
                 )
                 startCreatingEstablishment(newEstablishment)
             }
         } catch (e: DateTimeParseException) {
             Toast.makeText(context, "Date is badly formatted", Toast.LENGTH_LONG).show()
+        } catch (e: NumberFormatException) {
+            Toast.makeText(context, "Number of tables is badly formatted", Toast.LENGTH_LONG).show()
         }
 
 
