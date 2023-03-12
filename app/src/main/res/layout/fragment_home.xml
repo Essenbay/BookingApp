@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/home_toolbar"
         android:layout_marginVertical="10dp"
-        android:text="@string/empty_establishments_message"
+        android:text="@string/empty_search_message"
         android:textAlignment="center"
         android:visibility="invisible" />
 

@@ -1,10 +1,12 @@
 package com.example.bookingapp.data.datasource
 
+import android.util.Log
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
 import com.example.bookingapp.util.FirebaseResult
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -51,23 +53,41 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository {
                 }
         }
 
-    override suspend fun createReservation(reservation: Reservation): FirebaseResult<Boolean> =
-        suspendCoroutine { cont ->
-            db.collection(RESERVATION_COLLECTION).document().set(reservation)
-                .addOnSuccessListener {
-                    cont.resume(FirebaseResult.Success(true))
+    override suspend fun createReservation(
+        userUID: String,
+        establishmentID: String,
+        tableID: Int,
+        date: Timestamp
+    ): FirebaseResult<Boolean> {
+        return when (val checkResult = checkIfReservationReserved(establishmentID, tableID, date)) {
+            is FirebaseResult.Success -> {
+                suspendCoroutine { cont ->
+                    val newReservation = Reservation(userUID, establishmentID, tableID, date)
+                    db.collection(RESERVATION_COLLECTION).document().set(newReservation)
+                        .addOnSuccessListener {
+                            cont.resume(FirebaseResult.Success(true))
+                        }
+                        .addOnFailureListener {
+                            cont.resume(FirebaseResult.Error(it))
+                        }
                 }
-                .addOnFailureListener {
-                    cont.resume(FirebaseResult.Error(it))
-                }
+            }
+            is FirebaseResult.Error -> {
+                checkResult
+            }
         }
+    }
 
     //Find list of reservations in certain establishment then check if there is with same table and date/time
-    private suspend fun checkIfReservationReserved(reservation: Reservation): FirebaseResult<Boolean> {
-        when (val resultRes = getReservationsByEstablishment(reservation.establishmentId)) {
+    private suspend fun checkIfReservationReserved(
+        establishmentId: String,
+        tableID: Int,
+        date: Timestamp
+    ): FirebaseResult<Boolean> {
+        when (val resultRes = getReservationsByEstablishment(establishmentId)) {
             is FirebaseResult.Success -> {
                 for (res in resultRes.data) {
-                    if (res.dateTime == reservation.dateTime && res.tableID == reservation.tableID) {
+                    if (res.dateTime == date && res.tableID == tableID) {
                         return FirebaseResult.Success(false)
                     }
                 }
@@ -107,9 +127,9 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository {
         }
 
 
-    override suspend fun getReservationHistory(): FirebaseResult<List<Reservation>> =
+    override suspend fun getReservationByUser(userID: String): FirebaseResult<List<Reservation>> =
         suspendCoroutine { cont ->
-            val snapshot = db.collection(RESERVATION_COLLECTION).get()
+            val snapshot = db.collection(RESERVATION_COLLECTION).whereEqualTo("userID", userID).get()
             val reservations: MutableList<Reservation> = mutableListOf()
             snapshot
                 .addOnSuccessListener { result ->

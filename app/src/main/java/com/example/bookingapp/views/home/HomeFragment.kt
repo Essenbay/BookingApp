@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +20,10 @@ import com.example.bookingapp.viewmodels.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import com.example.bookingapp.R
+import com.example.bookingapp.data.models.Establishment
+import com.example.bookingapp.util.FirebaseResult
+import com.example.bookingapp.util.UserNotSignedIn
+import com.google.firebase.Timestamp
 
 
 class HomeFragment : Fragment() {
@@ -50,6 +55,10 @@ class HomeFragment : Fragment() {
                     findNavController().navigate(action)
                     true
                 }
+                R.id.update_establishment_list -> {
+                    viewModel.getEstablishments()
+                    true
+                }
                 else -> false
             }
         }
@@ -68,6 +77,14 @@ class HomeFragment : Fragment() {
             }
         })
 
+        binding.establishments.setOnClickListener {
+            val establishment =
+                (viewModel.filteredEstablishments.value as SearchResult.Success<List<Establishment>>).result[0]
+            val tableID = 1
+            val date = Timestamp.now()
+            createReservation(establishment, tableID, date)
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.filteredEstablishments.collect {
@@ -82,11 +99,11 @@ class HomeFragment : Fragment() {
     }
 
     //Todo: when first entering app loading state is staying until move from other fragments
-    private fun handleFilteredEstablishments(result: SearchResult) {
+    private fun handleFilteredEstablishments(result: SearchResult<List<Establishment>>) {
         when (result) {
             is SearchResult.Success -> {
                 var resultStr = "Establishments: \n"
-                for (e in result.establishments) resultStr += e.name + '\n'
+                for (e in result.result) resultStr += e.name + '\n'
                 binding.establishments.text = resultStr
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
@@ -107,6 +124,25 @@ class HomeFragment : Fragment() {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
         }
+    }
+
+    private fun createReservation(
+        establishment: Establishment,
+        tableID: Int,
+        date: Timestamp
+    ) = viewLifecycleOwner.lifecycleScope.launch {
+        when(val result = viewModel.createReservation(establishment.establishmentId, tableID, date)) {
+            is FirebaseResult.Success -> {
+                Toast.makeText(context, "The reservation was created", Toast.LENGTH_LONG).show()
+            }
+            is FirebaseResult.Error -> {
+                Toast.makeText(context, result.exception.message, Toast.LENGTH_LONG).show()
+                if(result.exception is UserNotSignedIn) {
+                    //Todo: Add navigation
+                }
+            }
+        }
+
     }
 
     override fun onDestroy() {

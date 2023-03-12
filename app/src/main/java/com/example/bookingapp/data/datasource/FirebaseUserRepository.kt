@@ -1,6 +1,7 @@
 package com.example.bookingapp.data.datasource
 
 import android.util.Log
+import com.example.bookingapp.data.repositories.AccessUserID
 import com.example.bookingapp.data.repositories.UserRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.auth.EmailAuthProvider
@@ -12,7 +13,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class FirebaseUserRepository() : UserRepository {
+class FirebaseUserRepository() : UserRepository, AccessUserID {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var _user: MutableStateFlow<FirebaseUser?> = MutableStateFlow(auth.currentUser)
     override val user: StateFlow<FirebaseUser?> = _user.asStateFlow()
@@ -144,5 +145,9 @@ class FirebaseUserRepository() : UserRepository {
         _user.update {
             auth.currentUser
         }
+    }
+
+    override fun getUserID(): String? {
+        return _user.value?.uid
     }
 }
