@@ -27,7 +27,7 @@ class HomeEstablishmentDetailViewModel(
 ) : ViewModel() {
     private val _establishment: MutableStateFlow<FirebaseResult<Establishment>?> =
         MutableStateFlow(null)
-    private val establishment: StateFlow<FirebaseResult<Establishment>?> =
+    val establishment: StateFlow<FirebaseResult<Establishment>?> =
         _establishment.asStateFlow()
 
     init {

@@ -4,7 +4,7 @@
     <!-- Home fragment -->
     <string name="home_label">Home</string>
     <string name="empty_search_message">Nothing was found. Try changing the query.</string>
-    <string name="establishment_time">$s-$e</string>
+    <string name="establishment_time">%1$s-%2$s</string>
 
     <string name="reservations_label">Reservations</string>
 
