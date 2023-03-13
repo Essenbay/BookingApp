@@ -60,9 +60,6 @@ class AccountLogInFragment : Fragment() {
             toSignupBtn.setOnClickListener {
                 Log.d("Login fragment", "on register")
                 val action = AccountLogInFragmentDirections.logInToSignUp()
-//                viewModel.userInputState.update {
-//                    it.copy(passwordInput = "", emailInput = "")
-//                }
                 view.findNavController().navigate(action)
             }
         }
@@ -73,7 +70,7 @@ class AccountLogInFragment : Fragment() {
         when(val result = viewModel.login(email, password)){
             is FirebaseResult.Success -> {
                 Toast.makeText(context, "Successfully logged in", Toast.LENGTH_LONG).show()
-                view.findNavController().popBackStack()
+                view.findNavController().navigateUp()
             }
             is FirebaseResult.Error -> {
                 Toast.makeText(

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.repositories.AccessUserID
+import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
@@ -22,7 +22,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class HomeViewModel(
     private val establishmentsRepository: EstablishmentsRepository,
-    private val accessUserID: AccessUserID
+    private val accessUser: AccessUser
 ) :
     ViewModel() {
     private var _establishments: List<Establishment> = emptyList()
@@ -36,7 +36,8 @@ class HomeViewModel(
     }
 
     suspend fun searchEstablishments(query: String?) {
-        _filteredEstablishments.update { startSearchEstablishments(query) }
+        val result = startSearchEstablishments(query)
+        _filteredEstablishments.update { result }
     }
 
     private suspend fun startSearchEstablishments(query: String?): SearchResult<List<Establishment>> =
@@ -49,7 +50,8 @@ class HomeViewModel(
                     if (e.name.lowercase().contains(query.lowercase())) resultList.add(e)
                 }
                 if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
-                else cont.resume(SearchResult.Success(resultList))            }
+                else cont.resume(SearchResult.Success(resultList))
+            }
         }
 
     suspend fun addEstablishment(newEstablishment: Establishment): FirebaseResult<Boolean> =
@@ -68,16 +70,16 @@ class HomeViewModel(
     }
 
     suspend fun createReservation(
-        establishmentID: String,
+        establishment: Establishment,
         tableID: Int,
         date: Timestamp
     ): FirebaseResult<Boolean> {
-        val userUID = accessUserID.getUserID()
+        val userUID = accessUser.user.value?.uid
         return if (userUID == null) FirebaseResult.Error(UserNotSignedIn())
         else {
             establishmentsRepository.createReservation(
                 userUID,
-                establishmentID,
+                establishment,
                 tableID,
                 date
             )

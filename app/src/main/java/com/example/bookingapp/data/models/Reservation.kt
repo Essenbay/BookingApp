@@ -7,25 +7,25 @@ data class Reservation(
     @DocumentId
     val id: String,
     val userID: String,
-    val establishmentId: String,
+    val establishment: Establishment,
     val tableID: Int,
     val dateTime: Timestamp
 ) {
     @Suppress("unused")
     constructor() : this(
-        "", "", "", 0,
+        "", "", Establishment(), 0,
         Timestamp(0, 0)
     )
 
     constructor(
-        establishmentId: String,
         userID: String,
+        establishment: Establishment,
         tableID: Int,
         dateTime: Timestamp
     ) : this(
         "",
-        establishmentId,
         userID,
+        establishment,
         tableID,
         dateTime
     )

@@ -55,14 +55,14 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository {
 
     override suspend fun createReservation(
         userUID: String,
-        establishmentID: String,
+        establishment: Establishment,
         tableID: Int,
         date: Timestamp
     ): FirebaseResult<Boolean> {
-        return when (val checkResult = checkIfReservationReserved(establishmentID, tableID, date)) {
+        return when (val checkResult = checkIfReservationReserved(establishment.establishmentId, tableID, date)) {
             is FirebaseResult.Success -> {
                 suspendCoroutine { cont ->
-                    val newReservation = Reservation(userUID, establishmentID, tableID, date)
+                    val newReservation = Reservation(userUID, establishment, tableID, date)
                     db.collection(RESERVATION_COLLECTION).document().set(newReservation)
                         .addOnSuccessListener {
                             cont.resume(FirebaseResult.Success(true))

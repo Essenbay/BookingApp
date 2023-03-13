@@ -17,11 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 class AccountViewModel(private val userRepository: UserRepository) : ViewModel() {
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     val user: StateFlow<FirebaseUser?> = userRepository.user
-    private val _isUserVerified: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isUserVerified: StateFlow<Boolean> = _isUserVerified.asStateFlow()
-
 
     suspend fun register(
         fullName: String,

@@ -1,23 +1,36 @@
 package com.example.bookingapp.views.reservationhistory
 
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import com.example.bookingapp.R
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
 import com.example.bookingapp.util.SearchResult
+import com.example.bookingapp.util.UserNotSignedIn
 import com.example.bookingapp.viewmodels.ReservationsViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class ReservationHistoryFragment : Fragment() {
     private var _binding: FragmentReservationHistoryBinding? = null
@@ -37,6 +50,21 @@ class ReservationHistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.user.collect {
+                    if(it == null) {
+                        Snackbar.make(view, "You are not signed in!", Snackbar.LENGTH_LONG).show()
+                        val action = ReservationHistoryFragmentDirections.toAccount()
+                        findNavController().navigate(action)
+                    }
+                }
+            }
+        }
+
+        onSearch(null)
+
         binding.reservationsToolbar.inflateMenu(R.menu.reservations_menu)
         binding.reservationsToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -65,7 +93,7 @@ class ReservationHistoryFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.filteredReservations.collect {
-                    handleFilteredReservations(it)
+                    handleFilteredReservations(it, view)
                 }
             }
         }
@@ -75,12 +103,15 @@ class ReservationHistoryFragment : Fragment() {
         viewModel.searchReservations(query)
     }
 
-    //Todo: when first entering app loading state is staying until move from other fragments
-    private fun handleFilteredReservations(result: SearchResult<List<Reservation>>) {
+    //Todo: Progress bar is not showing
+    private fun handleFilteredReservations(result: SearchResult<List<Reservation>>, view: View) {
         when (result) {
             is SearchResult.Success -> {
                 var resultStr = "Reservations: \n"
-                for (e in result.result) resultStr += e.establishmentId + '\n'
+                for (e in result.result) {
+                    val dateStr = DateFormat.format("dd.MM.yyyy HH:mm", e.dateTime.toDate())
+                    resultStr += "Establishment: ${e.establishment.name}, table #${e.tableID}, at: $dateStr\n"
+                }
                 binding.reservations.text = resultStr
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
@@ -90,10 +121,15 @@ class ReservationHistoryFragment : Fragment() {
                 binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Error -> {
-                binding.emptyResultMsg.visibility = View.INVISIBLE
-                binding.progressBar.visibility = View.INVISIBLE
-                view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
-                Log.d("HomeFragment", result.exception.toString())
+                if (result.exception is UserNotSignedIn) {
+                    Snackbar.make(view, "You are not signed in!", Snackbar.LENGTH_LONG).show()
+                    val action = ReservationHistoryFragmentDirections.toAccount()
+                    findNavController().navigate(action)
+                } else {
+                    binding.emptyResultMsg.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.INVISIBLE
+                    Snackbar.make(view, "Something went wrong...", Snackbar.LENGTH_LONG).show()
+                }
             }
             is SearchResult.Loading -> {
                 binding.progressBar.visibility = View.VISIBLE
