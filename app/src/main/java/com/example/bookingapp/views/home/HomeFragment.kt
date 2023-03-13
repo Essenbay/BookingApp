@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.databinding.FragmentHomeBinding
 import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.viewmodels.HomeViewModel
@@ -40,6 +41,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding.establishments.layoutManager = LinearLayoutManager(context)
         return binding.root
     }
 
@@ -103,6 +105,8 @@ class HomeFragment : Fragment() {
                     EstablishmentsAdapter(result.result) { establishment, tableID, date ->
                         createReservation(establishment, tableID, date)
                     }
+                Log.d("HomeFragment", "Store: ${result.result.toString()}")
+
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
@@ -115,7 +119,6 @@ class HomeFragment : Fragment() {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
-                Log.d("HomeFragment", result.exception.toString())
             }
             is SearchResult.Loading -> {
                 binding.progressBar.visibility = View.VISIBLE

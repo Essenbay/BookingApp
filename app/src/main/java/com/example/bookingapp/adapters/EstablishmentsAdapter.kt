@@ -1,5 +1,6 @@
 package com.example.bookingapp.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -11,7 +12,7 @@ import com.google.firebase.Timestamp
 import java.util.*
 
 class EstablishmentsAdapter(
-    private val establishments: List<Establishment>,
+    val establishments: List<Establishment>,
     private val onEstablishmentClicked: (
         establishment: Establishment,
         tableID: Int,
@@ -28,6 +29,8 @@ class EstablishmentsAdapter(
     override fun getItemCount(): Int = establishments.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d("Adapter", "Adapter: ${establishments.toString()}")
+
         holder.bind(establishments[position])
         holder.itemView.setOnClickListener {
             val tableID = 1
