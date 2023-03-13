@@ -102,11 +102,11 @@ class HomeFragment : Fragment() {
             is SearchResult.Success -> {
                 binding.establishments.visibility = View.VISIBLE
                 binding.establishments.adapter =
-                    EstablishmentsAdapter(result.result) { establishment, tableID, date ->
-
+                    EstablishmentsAdapter(result.result) { establishment->
+                        val action =
+                            HomeFragmentDirections.toEstablishmentDetail(establishment.establishmentId)
+                        findNavController().navigate(action)
                     }
-                Log.d("HomeFragment", "Store: ${result.result.toString()}")
-
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
@@ -126,7 +126,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
 
 
     override fun onDestroy() {

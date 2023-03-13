@@ -15,8 +15,6 @@ class EstablishmentsAdapter(
     val establishments: List<Establishment>,
     private val onEstablishmentClicked: (
         establishment: Establishment,
-        tableID: Int,
-        date: Timestamp
     ) -> Unit
 ) : RecyclerView.Adapter<EstablishmentsAdapter.ViewHolder>() {
 
@@ -29,13 +27,12 @@ class EstablishmentsAdapter(
     override fun getItemCount(): Int = establishments.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.d("Adapter", "Adapter: ${establishments.toString()}")
 
         holder.bind(establishments[position])
         holder.itemView.setOnClickListener {
             val tableID = 1
             val date = Timestamp.now()
-            onEstablishmentClicked(establishments[position], tableID, date)
+            onEstablishmentClicked(establishments[position])
         }
     }
 

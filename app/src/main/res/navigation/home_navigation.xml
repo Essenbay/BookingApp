@@ -12,11 +12,11 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
+            android:id="@+id/to_establishment_detail"
+            app:destination="@id/establishmentDetail" />
+        <action
             android:id="@+id/to_add_establishment"
             app:destination="@id/fragment_home_add_establishment" />
-        <action
-            android:id="@+id/to_establishment"
-            app:destination="@id/establishmentDetail" />
     </fragment>
     <fragment
         android:id="@+id/fragment_home_add_establishment"
@@ -27,5 +27,9 @@
         android:id="@+id/establishmentDetail"
         android:name="com.example.bookingapp.views.home.EstablishmentDetail"
         android:label="EstablishmentDetail"
-        tools:layout="@layout/fragment_home_establishment_detail" />
+        tools:layout="@layout/fragment_home_establishment_detail">
+        <argument
+            android:name="establishmentID"
+            app:argType="string" />
+    </fragment>
 </navigation>
