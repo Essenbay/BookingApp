@@ -40,7 +40,10 @@ class HomeViewModel(
         _filteredEstablishments.update { result }
     }
 
+    //Todo: Filter???
+
     private suspend fun startSearchEstablishments(query: String?): SearchResult<List<Establishment>> =
+        //Todo: Add search by description
         suspendCoroutine { cont ->
             if (query == null || query.isBlank())
                 cont.resume(SearchResult.Success(_establishments))

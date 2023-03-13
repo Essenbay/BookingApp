@@ -110,7 +110,6 @@ class HomeFragment : Fragment() {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
-                //Todo: ???
                 binding.establishments.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
@@ -141,7 +140,6 @@ class HomeFragment : Fragment() {
                 Toast.makeText(context, result.exception.message, Toast.LENGTH_LONG).show()
             }
         }
-
     }
 
     override fun onDestroy() {
