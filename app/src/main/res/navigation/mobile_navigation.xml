@@ -14,7 +14,11 @@
         android:id="@+id/reservationHistoryFragment"
         android:name="com.example.bookingapp.views.reservationhistory.ReservationHistoryFragment"
         android:label="Reservation"
-        tools:layout="@layout/fragment_reservation_history" />
+        tools:layout="@layout/fragment_reservation_history" >
+        <action
+            android:id="@+id/toAccount"
+            app:destination="@id/accountFragment" />
+    </fragment>
     <fragment
         android:id="@+id/accountFragment"
         android:name="com.example.bookingapp.views.account.AccountFragment"

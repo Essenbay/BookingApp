@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import java.time.LocalTime
 
-//Todo: Add places list
 data class Establishment(
     @DocumentId
     val establishmentId: String,

@@ -49,12 +49,6 @@ class HomeAddEstablishmentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Todo: Delete following:
-        binding.editTitle.setText("Cafe")
-        binding.editDescription.setText("The place for you")
-        binding.editAddress.setText("Almaty")
-        binding.editTablesNumber.setText("3")
-
         binding.addEstablishmentToolbar.inflateMenu(R.menu.add_establishment_menu)
         binding.addEstablishmentToolbar.setOnMenuItemClickListener {
             when (it.itemId) {

@@ -4,8 +4,7 @@ import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.StateFlow
 
-interface UserRepository {
-    val user: StateFlow<FirebaseUser?>
+interface UserRepository : AccessUser {
     suspend fun register(
         email: String,
         password: String,

@@ -44,6 +44,9 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        onSearch(null)
+
         binding.homeToolbar.inflateMenu(R.menu.home_menu)
         binding.homeToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -98,7 +101,7 @@ class HomeFragment : Fragment() {
         viewModel.searchEstablishments(query)
     }
 
-    //Todo: when first entering app loading state is staying until move from other fragments
+    //Todo: Progress bar is not showing
     private fun handleFilteredEstablishments(result: SearchResult<List<Establishment>>) {
         when (result) {
             is SearchResult.Success -> {
@@ -131,15 +134,12 @@ class HomeFragment : Fragment() {
         tableID: Int,
         date: Timestamp
     ) = viewLifecycleOwner.lifecycleScope.launch {
-        when(val result = viewModel.createReservation(establishment.establishmentId, tableID, date)) {
+        when(val result = viewModel.createReservation(establishment, tableID, date)) {
             is FirebaseResult.Success -> {
                 Toast.makeText(context, "The reservation was created", Toast.LENGTH_LONG).show()
             }
             is FirebaseResult.Error -> {
                 Toast.makeText(context, result.exception.message, Toast.LENGTH_LONG).show()
-                if(result.exception is UserNotSignedIn) {
-                    //Todo: Add navigation
-                }
             }
         }
 

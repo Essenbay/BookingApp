@@ -1,52 +1,49 @@
 package com.example.bookingapp.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
-import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
-import com.example.bookingapp.data.repositories.AccessUserID
-import com.example.bookingapp.data.repositories.EstablishmentsRepository
+import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.ReceiveReservations
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
-import com.example.bookingapp.util.UserNotSignedIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class ReservationsViewModel(
     private val reservationRepository: ReceiveReservations,
-    private val userID: AccessUserID
+    private val userRepository: AccessUser
 ) : ViewModel() {
     private var _reservations: List<Reservation> = emptyList()
     private var _filteredReservations: MutableStateFlow<SearchResult<List<Reservation>>> =
         MutableStateFlow(SearchResult.Loading)
     val filteredReservations = _filteredReservations.asStateFlow()
+    val user: StateFlow<FirebaseUser?> = userRepository.user
 
     init {
-        getReservations()
+        viewModelScope.launch {
+            user.collect {
+                if(it != null) {
+                    getReservations()
+                }
+            }
+        }
     }
     fun getReservations() = viewModelScope.launch {
-        val userID = userID.getUserID()
-        if (userID == null) {
-            SearchResult.Error(UserNotSignedIn())
-        } else {
-            when (val result = reservationRepository.getReservationByUser(userID)) {
-                is FirebaseResult.Success -> {
-                    _reservations = result.data
-                    searchReservations("")
-                }
-                is FirebaseResult.Error -> _filteredReservations.update {
-                    SearchResult.Error(result.exception)
-                }
+        when (val result = user.value?.let { reservationRepository.getReservationByUser(it.uid) }) {
+            is FirebaseResult.Success -> {
+                _reservations = result.data
+                searchReservations("")
+            }
+            is FirebaseResult.Error -> _filteredReservations.update {
+                SearchResult.Error(result.exception)
             }
         }
     }
@@ -59,10 +56,8 @@ class ReservationsViewModel(
                 cont.resume(SearchResult.Success(_reservations))
             else {
                 val resultList = mutableListOf<Reservation>()
-                for (e in _reservations) {
-                    //Todo: Add to Reservation class establishment whole not only id
-//                    if (e.name.lowercase().contains(query.lowercase()))
-                    resultList.add(e)
+                for (r in _reservations) {
+                    if (r.establishment.name.lowercase().contains(query.lowercase())) resultList.add(r)
                 }
                 if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
                 else cont.resume(SearchResult.Success(resultList))            }
