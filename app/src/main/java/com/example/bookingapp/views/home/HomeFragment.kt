@@ -103,7 +103,7 @@ class HomeFragment : Fragment() {
                 binding.establishments.visibility = View.VISIBLE
                 binding.establishments.adapter =
                     EstablishmentsAdapter(result.result) { establishment, tableID, date ->
-                        createReservation(establishment, tableID, date)
+
                     }
                 Log.d("HomeFragment", "Store: ${result.result.toString()}")
 
@@ -127,20 +127,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun createReservation(
-        establishment: Establishment,
-        tableID: Int,
-        date: Timestamp
-    ) = viewLifecycleOwner.lifecycleScope.launch {
-        when (val result = viewModel.createReservation(establishment, tableID, date)) {
-            is FirebaseResult.Success -> {
-                Toast.makeText(context, "The reservation was created", Toast.LENGTH_LONG).show()
-            }
-            is FirebaseResult.Error -> {
-                Toast.makeText(context, result.exception.message, Toast.LENGTH_LONG).show()
-            }
-        }
-    }
+
 
     override fun onDestroy() {
         super.onDestroy()

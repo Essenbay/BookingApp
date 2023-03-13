@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="10dp">
-    <!-- If description or address is too long then add '...' -->
+    <!-- Todo: If description or address is too long then add '...' -->
     <TextView
         android:id="@+id/establishment_name"
         style="@style/TextAppearance.AppCompat.Title"

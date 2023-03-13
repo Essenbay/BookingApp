@@ -3,6 +3,7 @@ package com.example.bookingapp.data.datasource
 import android.util.Log
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
+import com.example.bookingapp.data.repositories.EstablishmentRepository
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
 import com.example.bookingapp.util.FirebaseResult
@@ -18,7 +19,7 @@ const val USER_COLLECTION = "users"
 const val RESERVATION_COLLECTION = "reservations"
 const val ESTABLISHMENT_COLLECTION = "establishments"
 
-class FirestoreRepository : ReceiveReservations, EstablishmentsRepository {
+class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository {
     private val db: FirebaseFirestore = Firebase.firestore
 
 

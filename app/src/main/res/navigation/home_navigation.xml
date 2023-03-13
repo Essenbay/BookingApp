@@ -10,14 +10,22 @@
         android:id="@+id/fragment_home"
         android:name="com.example.bookingapp.views.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/to_add_establishment"
             app:destination="@id/fragment_home_add_establishment" />
+        <action
+            android:id="@+id/to_establishment"
+            app:destination="@id/establishmentDetail" />
     </fragment>
     <fragment
         android:id="@+id/fragment_home_add_establishment"
         android:name="com.example.bookingapp.views.home.HomeAddEstablishmentFragment"
         android:label="fragment_home_add_establishment"
         tools:layout="@layout/fragment_home_add_establishment" />
+    <fragment
+        android:id="@+id/establishmentDetail"
+        android:name="com.example.bookingapp.views.home.EstablishmentDetail"
+        android:label="EstablishmentDetail"
+        tools:layout="@layout/fragment_home_establishment_detail" />
 </navigation>
