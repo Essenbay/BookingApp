@@ -72,23 +72,6 @@ class HomeViewModel(
         }
     }
 
-    suspend fun createReservation(
-        establishment: Establishment,
-        tableID: Int,
-        date: Timestamp
-    ): FirebaseResult<Boolean> {
-        val userUID = accessUser.user.value?.uid
-        return if (userUID == null) FirebaseResult.Error(UserNotSignedIn())
-        else {
-            establishmentsRepository.createReservation(
-                userUID,
-                establishment,
-                tableID,
-                date
-            )
-        }
-    }
-
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
