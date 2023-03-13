@@ -20,6 +20,7 @@ import com.example.bookingapp.viewmodels.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import com.example.bookingapp.R
+import com.example.bookingapp.adapters.EstablishmentsAdapter
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.UserNotSignedIn
@@ -80,14 +81,6 @@ class HomeFragment : Fragment() {
             }
         })
 
-        binding.establishments.setOnClickListener {
-            val establishment =
-                (viewModel.filteredEstablishments.value as SearchResult.Success<List<Establishment>>).result[0]
-            val tableID = 1
-            val date = Timestamp.now()
-            createReservation(establishment, tableID, date)
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.filteredEstablishments.collect {
@@ -105,13 +98,16 @@ class HomeFragment : Fragment() {
     private fun handleFilteredEstablishments(result: SearchResult<List<Establishment>>) {
         when (result) {
             is SearchResult.Success -> {
-                var resultStr = "Establishments: \n"
-                for (e in result.result) resultStr += e.name + '\n'
-                binding.establishments.text = resultStr
+                binding.establishments.visibility = View.VISIBLE
+                binding.establishments.adapter =
+                    EstablishmentsAdapter(result.result) { establishment, tableID, date ->
+                        createReservation(establishment, tableID, date)
+                    }
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
-                binding.establishments.text = ""
+                //Todo: ???
+                binding.establishments.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
             }
@@ -134,7 +130,7 @@ class HomeFragment : Fragment() {
         tableID: Int,
         date: Timestamp
     ) = viewLifecycleOwner.lifecycleScope.launch {
-        when(val result = viewModel.createReservation(establishment, tableID, date)) {
+        when (val result = viewModel.createReservation(establishment, tableID, date)) {
             is FirebaseResult.Success -> {
                 Toast.makeText(context, "The reservation was created", Toast.LENGTH_LONG).show()
             }
