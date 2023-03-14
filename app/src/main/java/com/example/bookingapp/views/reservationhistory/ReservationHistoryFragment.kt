@@ -15,12 +15,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.R
+import com.example.bookingapp.adapters.EstablishmentsAdapter
+import com.example.bookingapp.adapters.ReservationAdapter
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
 import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.util.UserNotSignedIn
 import com.example.bookingapp.viewmodels.ReservationsViewModel
+import com.example.bookingapp.views.home.HomeFragmentDirections
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -45,6 +49,7 @@ class ReservationHistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentReservationHistoryBinding.inflate(inflater, container, false)
+        binding.reservations.layoutManager = LinearLayoutManager(context)
         return binding.root
     }
 
@@ -107,16 +112,13 @@ class ReservationHistoryFragment : Fragment() {
     private fun handleFilteredReservations(result: SearchResult<List<Reservation>>, view: View) {
         when (result) {
             is SearchResult.Success -> {
-                var resultStr = "Reservations: \n"
-                for (e in result.result) {
-                    val dateStr = DateFormat.format("dd.MM.yyyy HH:mm", e.dateTime.toDate())
-                    resultStr += "Establishment: ${e.establishment.name}, table #${e.tableID}, at: $dateStr\n"
-                }
-                binding.reservations.text = resultStr
+                binding.reservations.visibility = View.VISIBLE
+                binding.reservations.adapter =
+                    ReservationAdapter(result.result){}
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
-                binding.reservations.text = ""
+                binding.reservations.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
             }
