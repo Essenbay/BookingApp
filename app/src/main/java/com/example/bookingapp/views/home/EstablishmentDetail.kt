@@ -54,6 +54,9 @@ class EstablishmentDetail : Fragment() {
         binding.closeBtn.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        setClickListener()
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.establishment.collect {
@@ -91,6 +94,14 @@ class EstablishmentDetail : Fragment() {
             }
         }
     }
+
+    private fun setClickListener() {
+        binding.btnSubmit.setOnClickListener {
+            val msg = binding.ratingBar.rating.toString()
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onDestroy() {
         _binding = null
