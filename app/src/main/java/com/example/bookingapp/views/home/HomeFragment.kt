@@ -108,6 +108,7 @@ class HomeFragment : Fragment() {
                         findNavController().navigate(action)
                     }
                 binding.emptyResultMsg.visibility = View.INVISIBLE
+                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
                 binding.establishments.visibility = View.INVISIBLE
@@ -121,8 +122,7 @@ class HomeFragment : Fragment() {
             }
             is SearchResult.Loading -> {
                 binding.progressBar.visibility = View.VISIBLE
-                binding.establishments.visibility = View.INVISIBLE
-                binding.emptyResultMsg.visibility = View.INVISIBLE
+
             }
         }
     }

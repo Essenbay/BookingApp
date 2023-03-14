@@ -31,5 +31,16 @@
         <argument
             android:name="establishmentID"
             app:argType="string" />
+        <action
+            android:id="@+id/to_create_reservation"
+            app:destination="@id/createReservationDialog" />
     </fragment>
+    <dialog
+        android:id="@+id/createReservationDialog"
+        android:name="com.example.bookingapp.views.home.CreateReservationDialog"
+        android:label="CreateReservationDialog">
+        <argument
+            android:name="establishment"
+            app:argType="com.example.bookingapp.data.models.Establishment" />
+    </dialog>
 </navigation>
