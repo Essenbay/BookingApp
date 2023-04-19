@@ -26,29 +26,6 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/baseline_person_24"
-                app:tint="@color/blue_400" />
-
-            <TextView
-                android:id="@+id/username"
-                style="@style/TextAppearance.Material3.BodyLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:text="Username" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_margin="5dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:src="@drawable/baseline_home_work_24"
                 app:tint="@color/blue_400" />
 
@@ -76,20 +53,19 @@
                 app:tint="@color/blue_400" />
 
             <TextView
-                android:id="@+id/table_ID"
                 style="@style/TextAppearance.Material3.BodyLarge"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_weight="1"
-                android:text="1" />
+                android:text="Table:" />
 
             <Button
-                android:id="@+id/change_table_btn"
+                android:id="@+id/table_id"
                 style="@style/Widget.AppCompat.Button.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change"
+                android:text="1"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
         </LinearLayout>
 
@@ -108,24 +84,54 @@
                 app:tint="@color/blue_400" />
 
             <TextView
-                android:id="@+id/datetime"
                 style="@style/TextAppearance.Material3.BodyLarge"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_weight="1"
-                android:text="1" />
+                android:text="From:" />
 
             <Button
-                android:id="@+id/change_date_btn"
+                android:id="@+id/from_date_btn"
                 style="@style/Widget.AppCompat.Button.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change"
+                android:text="Date"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
         </LinearLayout>
-    </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_date_range_24"
+                app:tint="@color/blue_400" />
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_weight="1"
+                android:text="To:" />
+
+            <Button
+                android:id="@+id/to_date_btn"
+                style="@style/Widget.AppCompat.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/primary">
         <item
-            android:id="@id/homeFragment"
+            android:id="@id/home_navigation"
             android:contentDescription="@string/home_label"
             android:icon="@drawable/baseline_home_24"
             android:iconTint="@color/blue_400"
@@ -17,7 +17,7 @@
             android:title="@string/reservations_label"
             app:showAsAction="always" />
         <item
-            android:id="@id/accountFragment"
+            android:id="@id/auth_navigation"
             android:contentDescription="@string/user_label"
             android:icon="@drawable/baseline_user_24"
             android:iconTint="@color/blue_400"

@@ -16,6 +16,7 @@ import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.checkLoginField
 import com.example.bookingapp.util.checkPasswordField
 import com.example.bookingapp.viewmodels.AccountViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
@@ -69,12 +70,11 @@ class AccountLogInFragment : Fragment() {
         binding.progressCircular.visibility = View.VISIBLE
         when(val result = viewModel.login(email, password)){
             is FirebaseResult.Success -> {
-                Toast.makeText(context, "Successfully logged in", Toast.LENGTH_LONG).show()
+                Snackbar.make(view, "Successfully logged in", Toast.LENGTH_LONG).show()
                 view.findNavController().navigateUp()
             }
             is FirebaseResult.Error -> {
-                Toast.makeText(
-                    context,
+                Snackbar.make(view,
                     result.exception.localizedMessage ?: "Unknown error", Toast.LENGTH_LONG
                 ).show()
                 binding.progressCircular.visibility = View.INVISIBLE

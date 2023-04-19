@@ -15,12 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.example.bookingapp.AuthNavigationDirections
 import com.example.bookingapp.R
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
 import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.util.UserNotSignedIn
 import com.example.bookingapp.viewmodels.ReservationsViewModel
+import com.example.bookingapp.views.home.HomeFragmentDirections
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -54,10 +56,12 @@ class ReservationHistoryFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect {
-                    if(it == null) {
+                    if (it == null) {
                         Snackbar.make(view, "You are not signed in!", Snackbar.LENGTH_LONG).show()
                         val action = ReservationHistoryFragmentDirections.toAccount()
                         findNavController().navigate(action)
+                    } else {
+                        Log.d("ReservationHistory", "Signed in!!!!")
                     }
                 }
             }
@@ -102,6 +106,7 @@ class ReservationHistoryFragment : Fragment() {
     private fun onSearch(query: String?) = viewLifecycleOwner.lifecycleScope.launch {
         viewModel.searchReservations(query)
     }
+
 
     //Todo: Progress bar is not showing
     private fun handleFilteredReservations(result: SearchResult<List<Reservation>>, view: View) {

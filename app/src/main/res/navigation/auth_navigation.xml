@@ -70,6 +70,4 @@
         android:name="com.example.bookingapp.views.account.EditUserPasswordFragment"
         android:label="fragment_edit_user_password"
         tools:layout="@layout/fragment_edit_user_password" />
-
-
 </navigation>

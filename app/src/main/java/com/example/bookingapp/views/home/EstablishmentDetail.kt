@@ -76,10 +76,15 @@ class EstablishmentDetail : Fragment() {
                                 workingTimeEndStr
                             )
                             binding.establishmentPhoneNumbers.text = est.phoneNumbers
+                            binding.establishmentTableNumber.text = est.tableNumber.toString()
 
                             binding.createReservationBtn.setOnClickListener {
-                                binding.progressBar.visibility = View.VISIBLE
-                                createReservation(est, est.tableNumber, Timestamp.now())
+                                findNavController().navigate(
+                                    EstablishmentDetailDirections.toCreateReservation(
+                                        est
+                                    )
+                                )
+//                                createReservation(est, est.tableNumber, Timestamp.now())
                             }
                         }
                         is FirebaseResult.Error -> {

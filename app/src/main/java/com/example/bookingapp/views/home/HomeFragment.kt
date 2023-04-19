@@ -1,26 +1,24 @@
 package com.example.bookingapp.views.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
-import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentHomeBinding
 import com.example.bookingapp.util.SearchResult
 import com.example.bookingapp.viewmodels.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import com.example.bookingapp.R
 import com.example.bookingapp.adapters.EstablishmentsAdapter
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.util.FirebaseResult
@@ -34,13 +32,14 @@ class HomeFragment : Fragment() {
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val viewModel: HomeViewModel by viewModels { HomeViewModel.Factory }
+    private val viewModel: HomeViewModel by navGraphViewModels(R.id.home_navigation) { HomeViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        R.id.home_navigation
         binding.establishments.layoutManager = LinearLayoutManager(context)
         return binding.root
     }
@@ -49,7 +48,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         onSearch(null)
-
         binding.homeToolbar.inflateMenu(R.menu.home_menu)
         binding.homeToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -102,7 +100,7 @@ class HomeFragment : Fragment() {
             is SearchResult.Success -> {
                 binding.establishments.visibility = View.VISIBLE
                 binding.establishments.adapter =
-                    EstablishmentsAdapter(result.result) { establishment->
+                    EstablishmentsAdapter(result.result) { establishment ->
                         val action =
                             HomeFragmentDirections.toEstablishmentDetail(establishment.establishmentId)
                         findNavController().navigate(action)
