@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.models.Reservation
+import com.example.bookingapp.data.models.ReservationWithEstablishment
 import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.ReceiveReservations
 import com.example.bookingapp.util.SearchResult
@@ -22,8 +22,8 @@ class ReservationsViewModel(
     private val reservationRepository: ReceiveReservations,
     private val userRepository: AccessUser
 ) : ViewModel() {
-    private var _reservationEstablishmentMap: Map<Reservation, Establishment> = emptyMap()
-    private var _filteredReservations: MutableStateFlow<SearchResult<Map<Reservation, Establishment>>> =
+    private var _reservationEstablishments: List<ReservationWithEstablishment> = listOf()
+    private var _filteredReservations: MutableStateFlow<SearchResult<List<ReservationWithEstablishment>>> =
         MutableStateFlow(SearchResult.Loading)
     val filteredReservations = _filteredReservations.asStateFlow()
     val user: StateFlow<FirebaseUser?> = userRepository.user
@@ -40,8 +40,8 @@ class ReservationsViewModel(
 
     fun getReservations() = viewModelScope.launch {
         if(user.value != null) {
-            val result = reservationRepository.getReservationEstablishmentMapByUser(user.value!!.uid)
-            _reservationEstablishmentMap = result
+            val result = reservationRepository.getReservationEstablishmentByUser(user.value!!.uid)
+            _reservationEstablishments = result
             searchReservations("")
         } else {
             _filteredReservations.update {
@@ -55,23 +55,19 @@ class ReservationsViewModel(
         _filteredReservations.update { startSearchReservations(query) }
     }
 
-    private suspend fun startSearchReservations(query: String?): SearchResult<Map<Reservation, Establishment>> =
+    private suspend fun startSearchReservations(query: String?): SearchResult<List<ReservationWithEstablishment>> =
         suspendCoroutine { cont ->
             if (query == null || query.isBlank())
-                cont.resume(SearchResult.Success(_reservationEstablishmentMap))
+                cont.resume(SearchResult.Success(_reservationEstablishments))
             else {
-                val resultList:MutableMap<Reservation, Establishment> = mutableMapOf()
-                for (pair in _reservationEstablishmentMap) {
-                    if (pair.value.name.lowercase().contains(query.lowercase())) resultList[pair.key] =
-                        pair.value
+                val resultList:MutableList<ReservationWithEstablishment> = mutableListOf()
+                for (pair in _reservationEstablishments) {
+                    if (pair.establishment.name.lowercase().contains(query.lowercase())) resultList.add(pair)
                 }
                 if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
                 else cont.resume(SearchResult.Success(resultList))
             }
         }
-
-    suspend fun getEstablishmentById(establishmentId: String): Establishment =
-        reservationRepository.getEstablishmentById(establishmentId)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

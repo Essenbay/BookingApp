@@ -1,7 +1,6 @@
 package com.example.bookingapp.views.reservationhistory
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,9 +11,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.R
-import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.models.Reservation
+import com.example.bookingapp.adapters.ReservationAdapter
+import com.example.bookingapp.data.models.ReservationWithEstablishment
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
 import com.example.bookingapp.util.*
 import com.example.bookingapp.viewmodels.ReservationsViewModel
@@ -32,7 +32,7 @@ class ReservationHistoryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentReservationHistoryBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -48,11 +48,14 @@ class ReservationHistoryFragment : Fragment() {
                         val action = ReservationHistoryFragmentDirections.toAccount()
                         findNavController().navigate(action)
                     } else {
-
+                        updateUI(view)
                     }
                 }
             }
         }
+    }
+
+    private fun updateUI(view: View) {
 
         onSearch(null)
 
@@ -81,6 +84,7 @@ class ReservationHistoryFragment : Fragment() {
             }
         })
 
+        binding.reservations.layoutManager = LinearLayoutManager(context)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.filteredReservations.collect {
@@ -96,32 +100,21 @@ class ReservationHistoryFragment : Fragment() {
 
 
     private fun handleFilteredReservations(
-        result: SearchResult<Map<Reservation, Establishment>>,
+        result: SearchResult<List<ReservationWithEstablishment>>,
         view: View
     ) {
         when (result) {
             is SearchResult.Success -> {
-                var resultStr = "Reservations: \n"
-                for (r in result.result) {
-                    try {
-                        resultStr += "Establishment: ${r.value.name}, table #${r.key.tableID}, ${
-                            formatDate(
-                                r.key.fromDate.toDate()
-                            )
-                        } - ${formatDate(r.key.toDate.toDate())}\n"
-                    } catch (e: Exception) {
-                        Snackbar.make(
-                            view,
-                            e.message ?: "An error occurred: $e",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
-                    binding.reservations.text = resultStr
-                    binding.emptyResultMsg.visibility = View.INVISIBLE
+                binding.reservations.adapter = ReservationAdapter(result.result) {
+                    Snackbar.make(view, "Reservation clicked", Snackbar.LENGTH_SHORT).show()
                 }
+                binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
-                binding.reservations.text = ""
+                binding.reservations.adapter = ReservationAdapter(emptyList()) {
+                    Snackbar.make(view, "Reservation clicked", Snackbar.LENGTH_SHORT).show()
+                }
+                binding.reservations.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
             }

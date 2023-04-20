@@ -2,6 +2,7 @@ package com.example.bookingapp.data.datasource
 
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
+import com.example.bookingapp.data.models.ReservationWithEstablishment
 import com.example.bookingapp.data.repositories.EstablishmentRepository
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
@@ -134,15 +135,15 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
         }
 
 
-    override suspend fun getReservationEstablishmentMapByUser(userID: String): Map<Reservation, Establishment> {
+    override suspend fun getReservationEstablishmentByUser(userID: String): List<ReservationWithEstablishment> {
         val reservations =
             db.collection(RESERVATION_COLLECTION).whereEqualTo("userID", userID).get()
                 .await().documents.map {
-                val r = it.toObject(Reservation::class.java)
-                if (r == null) {
-                    return@map Reservation()
-                } else return@map r
-            }
+                    val r = it.toObject(Reservation::class.java)
+                    if (r == null) {
+                        return@map Reservation()
+                    } else return@map r
+                }
 
         val establishmentIds = reservations.map { it.establishmentId }.distinct()
         val establishments = establishmentIds.map { establishmentId ->
@@ -150,10 +151,16 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
                 .toObject(Establishment::class.java)
         }
         val establishmentsMap = establishments.associateBy { it?.establishmentId ?: "" }
-
-        return reservations.associateWith { reservation ->
-            establishmentsMap[reservation.establishmentId] ?: Establishment()
+        val resultList: MutableList<ReservationWithEstablishment> = mutableListOf()
+        reservations.forEach { reservation ->
+            resultList.add(
+                ReservationWithEstablishment(
+                    reservation,
+                    establishmentsMap[reservation.establishmentId] ?: Establishment()
+                )
+            )
         }
+        return resultList
     }
 
     override suspend fun getEstablishmentById(establishmentId: String): Establishment =
