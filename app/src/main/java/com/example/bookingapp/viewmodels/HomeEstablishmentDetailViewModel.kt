@@ -37,18 +37,19 @@ class HomeEstablishmentDetailViewModel(
     }
 
     suspend fun createReservation(
-        establishment: Establishment,
+        establishmentId: String,
         tableID: Int,
-        date: Timestamp
+        fromDate: Timestamp,
+        toDate: Timestamp
     ): FirebaseResult<Boolean> {
         val userUID = accessUser.user.value?.uid
         return if (userUID == null) FirebaseResult.Error(UserNotSignedIn())
         else {
             establishmentRepository.createReservation(
                 userUID,
-                establishment,
+                establishmentId,
                 tableID,
-                date
+                fromDate, toDate
             )
         }
     }
@@ -56,7 +57,8 @@ class HomeEstablishmentDetailViewModel(
     companion object {
         fun getFactory(establishmentID: String): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookingApplication
+                val application =
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as BookingApplication
                 val firestoreRepository = application.container.storageRepository
                 val accessUserIDRepository = application.container.userRepository
                 HomeEstablishmentDetailViewModel(

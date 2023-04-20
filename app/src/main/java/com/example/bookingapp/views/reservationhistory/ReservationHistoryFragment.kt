@@ -1,40 +1,25 @@
 package com.example.bookingapp.views.reservationhistory
 
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.R
-import com.example.bookingapp.adapters.EstablishmentsAdapter
-import com.example.bookingapp.adapters.ReservationAdapter
+import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
-import com.example.bookingapp.util.SearchResult
-import com.example.bookingapp.util.UserNotSignedIn
+import com.example.bookingapp.util.*
 import com.example.bookingapp.viewmodels.ReservationsViewModel
-import com.example.bookingapp.views.home.HomeFragmentDirections
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 class ReservationHistoryFragment : Fragment() {
     private var _binding: FragmentReservationHistoryBinding? = null
@@ -49,7 +34,6 @@ class ReservationHistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentReservationHistoryBinding.inflate(inflater, container, false)
-        binding.reservations.layoutManager = LinearLayoutManager(context)
         return binding.root
     }
 
@@ -59,10 +43,12 @@ class ReservationHistoryFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect {
-                    if(it == null) {
+                    if (it == null) {
                         Snackbar.make(view, "You are not signed in!", Snackbar.LENGTH_LONG).show()
                         val action = ReservationHistoryFragmentDirections.toAccount()
                         findNavController().navigate(action)
+                    } else {
+
                     }
                 }
             }
@@ -108,17 +94,34 @@ class ReservationHistoryFragment : Fragment() {
         viewModel.searchReservations(query)
     }
 
-    //Todo: Progress bar is not showing
-    private fun handleFilteredReservations(result: SearchResult<List<Reservation>>, view: View) {
+
+    private fun handleFilteredReservations(
+        result: SearchResult<Map<Reservation, Establishment>>,
+        view: View
+    ) {
         when (result) {
             is SearchResult.Success -> {
-                binding.reservations.visibility = View.VISIBLE
-                binding.reservations.adapter =
-                    ReservationAdapter(result.result){}
-                binding.emptyResultMsg.visibility = View.INVISIBLE
+                var resultStr = "Reservations: \n"
+                for (r in result.result) {
+                    try {
+                        resultStr += "Establishment: ${r.value.name}, table #${r.key.tableID}, ${
+                            formatDate(
+                                r.key.fromDate.toDate()
+                            )
+                        } - ${formatDate(r.key.toDate.toDate())}\n"
+                    } catch (e: Exception) {
+                        Snackbar.make(
+                            view,
+                            e.message ?: "An error occurred: $e",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    binding.reservations.text = resultStr
+                    binding.emptyResultMsg.visibility = View.INVISIBLE
+                }
             }
             is SearchResult.Empty -> {
-                binding.reservations.visibility = View.INVISIBLE
+                binding.reservations.text = ""
                 binding.emptyResultMsg.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.INVISIBLE
             }
@@ -133,7 +136,7 @@ class ReservationHistoryFragment : Fragment() {
                     Snackbar.make(view, "Something went wrong...", Snackbar.LENGTH_LONG).show()
                 }
             }
-            is SearchResult.Loading -> {
+            else -> {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.reservations.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.INVISIBLE

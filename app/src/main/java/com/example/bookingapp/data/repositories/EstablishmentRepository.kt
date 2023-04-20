@@ -8,8 +8,9 @@ interface EstablishmentRepository {
     suspend fun getEstablishment(id: String): FirebaseResult<Establishment>
     suspend fun createReservation(
         userUID: String,
-        establishment: Establishment,
+        establishmentId: String,
         tableID: Int,
-        date: Timestamp
+        fromDate: Timestamp,
+        toDate: Timestamp
     ): FirebaseResult<Boolean>
 }

@@ -5,7 +5,7 @@
     android:id="@+id/home_navigation"
     app:startDestination="@id/fragment_home">
 
-    <!-- Add settings fragment -->
+    <!-- Todo: Add settings fragment -->
     <fragment
         android:id="@+id/fragment_home"
         android:name="com.example.bookingapp.views.home.HomeFragment"
@@ -31,5 +31,17 @@
         <argument
             android:name="establishmentID"
             app:argType="string" />
+        <action
+            android:id="@+id/to_create_reservation"
+            app:destination="@id/createReservationDialog" />
+    </fragment>
+    <fragment
+        android:id="@+id/createReservationDialog"
+        android:name="com.example.bookingapp.views.home.CreateReservationFragment"
+        android:label="CreateReservation"
+        tools:layout="@layout/fragment_reservation_create">
+        <argument
+            android:name="establishment"
+            app:argType="com.example.bookingapp.data.models.Establishment" />
     </fragment>
 </navigation>

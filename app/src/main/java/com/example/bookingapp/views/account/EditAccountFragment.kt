@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.navGraphViewModels
 import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentEditAccountBinding
 import com.example.bookingapp.viewmodels.AccountViewModel
@@ -19,7 +20,7 @@ class EditAccountFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AccountViewModel by viewModels { AccountViewModel.Factory }
+    private val viewModel: AccountViewModel by navGraphViewModels(R.id.auth_navigation) { AccountViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

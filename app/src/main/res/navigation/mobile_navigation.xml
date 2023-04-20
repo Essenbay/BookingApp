@@ -3,25 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/home_navigation">
 
-    <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.example.bookingapp.views.home.HomeContainerFragment"
+    <include
+        android:id="@id/home_navigation"
         android:label="Home"
-        tools:layout="@layout/fragment_home_container" />
+        app:graph="@navigation/home_navigation" />
+
+
     <fragment
         android:id="@+id/reservationHistoryFragment"
         android:name="com.example.bookingapp.views.reservationhistory.ReservationHistoryFragment"
         android:label="Reservation"
-        tools:layout="@layout/fragment_reservation_history" >
+        tools:layout="@layout/fragment_reservation_history">
         <action
             android:id="@+id/toAccount"
-            app:destination="@id/accountFragment" />
+            app:destination="@id/auth_navigation"
+            app:popUpToInclusive="true" />
     </fragment>
-    <fragment
-        android:id="@+id/accountFragment"
-        android:name="com.example.bookingapp.views.account.AccountFragment"
+
+    <include
         android:label="Account"
-        tools:layout="@layout/fragment_account" />
+        app:graph="@navigation/auth_navigation">
+        <action
+            android:id="@+id/toReservation"
+            app:destination="@id/reservationHistoryFragment"
+            app:popUpTo="@id/accountLogInFragment"
+            app:popUpToInclusive="true" />
+    </include>
 </navigation>

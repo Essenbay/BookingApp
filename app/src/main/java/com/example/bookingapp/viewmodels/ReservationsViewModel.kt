@@ -6,11 +6,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookingapp.BookingApplication
+import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.ReceiveReservations
-import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
+import com.example.bookingapp.util.UserNotSignedIn
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,8 +22,8 @@ class ReservationsViewModel(
     private val reservationRepository: ReceiveReservations,
     private val userRepository: AccessUser
 ) : ViewModel() {
-    private var _reservations: List<Reservation> = emptyList()
-    private var _filteredReservations: MutableStateFlow<SearchResult<List<Reservation>>> =
+    private var _reservationEstablishmentMap: Map<Reservation, Establishment> = emptyMap()
+    private var _filteredReservations: MutableStateFlow<SearchResult<Map<Reservation, Establishment>>> =
         MutableStateFlow(SearchResult.Loading)
     val filteredReservations = _filteredReservations.asStateFlow()
     val user: StateFlow<FirebaseUser?> = userRepository.user
@@ -30,38 +31,47 @@ class ReservationsViewModel(
     init {
         viewModelScope.launch {
             user.collect {
-                if(it != null) {
+                if (it != null) {
                     getReservations()
                 }
             }
         }
     }
+
     fun getReservations() = viewModelScope.launch {
-        when (val result = user.value?.let { reservationRepository.getReservationByUser(it.uid) }) {
-            is FirebaseResult.Success -> {
-                _reservations = result.data
-                searchReservations("")
-            }
-            is FirebaseResult.Error -> _filteredReservations.update {
-                SearchResult.Error(result.exception)
+        if(user.value != null) {
+            val result = reservationRepository.getReservationEstablishmentMapByUser(user.value!!.uid)
+            _reservationEstablishmentMap = result
+            searchReservations("")
+        } else {
+            _filteredReservations.update {
+                SearchResult.Error(UserNotSignedIn())
             }
         }
     }
+
+
     suspend fun searchReservations(query: String?) {
         _filteredReservations.update { startSearchReservations(query) }
     }
-    private suspend fun startSearchReservations(query: String?): SearchResult<List<Reservation>> =
+
+    private suspend fun startSearchReservations(query: String?): SearchResult<Map<Reservation, Establishment>> =
         suspendCoroutine { cont ->
             if (query == null || query.isBlank())
-                cont.resume(SearchResult.Success(_reservations))
+                cont.resume(SearchResult.Success(_reservationEstablishmentMap))
             else {
-                val resultList = mutableListOf<Reservation>()
-                for (r in _reservations) {
-                    if (r.establishment.name.lowercase().contains(query.lowercase())) resultList.add(r)
+                val resultList:MutableMap<Reservation, Establishment> = mutableMapOf()
+                for (pair in _reservationEstablishmentMap) {
+                    if (pair.value.name.lowercase().contains(query.lowercase())) resultList[pair.key] =
+                        pair.value
                 }
                 if (resultList.isEmpty()) cont.resume(SearchResult.Empty)
-                else cont.resume(SearchResult.Success(resultList))            }
+                else cont.resume(SearchResult.Success(resultList))
+            }
         }
+
+    suspend fun getEstablishmentById(establishmentId: String): Establishment =
+        reservationRepository.getEstablishmentById(establishmentId)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
