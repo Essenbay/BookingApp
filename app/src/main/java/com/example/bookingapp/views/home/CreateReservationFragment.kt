@@ -4,20 +4,26 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.bookingapp.data.models.Reservation
+import androidx.navigation.navGraphViewModels
+import com.example.bookingapp.R
+import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.databinding.FragmentReservationCreateBinding
-import java.text.SimpleDateFormat
+import com.example.bookingapp.util.FirebaseResult
+import com.example.bookingapp.util.formatDate
+import com.example.bookingapp.viewmodels.HomeEstablishmentDetailViewModel
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Timestamp
+import kotlinx.coroutines.launch
 import java.util.*
-
-const val KEY = "CREATE_RESERVATION_RESULT"
 
 class CreateReservationFragment : Fragment() {
     private val args: CreateReservationFragmentArgs by navArgs()
@@ -29,6 +35,12 @@ class CreateReservationFragment : Fragment() {
     private var fromDateTime: Calendar = Calendar.getInstance()
     private var toDateTime: Calendar = Calendar.getInstance()
     private var tableId: Int = 1
+    private val viewModel: HomeEstablishmentDetailViewModel by navGraphViewModels(R.id.home_navigation) {
+        HomeEstablishmentDetailViewModel.getFactory(
+            args.establishment.establishmentId
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,48 +53,71 @@ class CreateReservationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //Initialize reservation
-        binding.establishmentName.text = args.establishment.name
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.establishment.collect { result ->
+                    when (result) {
+                        is FirebaseResult.Success -> with(result.data) {
+                            binding.progressBar.visibility = View.INVISIBLE
 
-        binding.tableId.setOnClickListener {
-            val items: Array<CharSequence> = (1..args.establishment.tableNumber).map {
-                it.toString()
-            }.toTypedArray()
-            var chosenId = tableId
-            AlertDialog.Builder(context)
-                .setTitle("Choose table")
-                .setSingleChoiceItems(items, tableId - 1) { _, which ->
-                    chosenId = which + 1
+                            binding.establishmentName.text = this.name
+                            binding.tableId.setOnClickListener {
+                                val items: Array<CharSequence> = (1..this.tableNumber).map {
+                                    it.toString()
+                                }.toTypedArray()
+                                var chosenId = tableId
+                                AlertDialog.Builder(context)
+                                    .setTitle("Choose table")
+                                    .setSingleChoiceItems(items, tableId - 1) { _, which ->
+                                        chosenId = which + 1
+                                    }
+                                    .setItems(items) { _, which ->
+                                        chosenId = which + 1
+                                    }
+                                    .setNegativeButton("Cancel") { _, _ ->
+
+                                    }
+                                    .setPositiveButton("Save") { _, _ ->
+                                        binding.tableId.text = chosenId.toString()
+                                        tableId = chosenId
+                                    }.show()
+                            }
+                            binding.fromDateBtn.text =
+                                formatDate(fromDateTime.time)
+                            binding.fromDateBtn.setOnClickListener {
+                                pickFromDateTime()
+                            }
+
+                            binding.toDateBtn.text =
+                                formatDate(toDateTime.time)
+                            binding.toDateBtn.setOnClickListener {
+                                pickToDateTime()
+                            }
+
+                            binding.cancelBtn.setOnClickListener {
+                                findNavController().navigateUp()
+                            }
+
+                            binding.createReservationBtn.setOnClickListener {
+                                if (checkFields()) {
+                                    createReservation(this.establishmentId)
+                                }
+                            }
+                        }
+                        is FirebaseResult.Error -> {
+                            binding.progressBar.visibility = View.INVISIBLE
+
+                            Snackbar.make(view, "${result.exception}", Snackbar.LENGTH_LONG).show()
+                            findNavController().navigateUp()
+                        }
+                        else -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                        }
+                    }
                 }
-                .setItems(items) { _, which ->
-                    chosenId = which + 1
-                }
-                .setNegativeButton("Cancel") { _, _ ->
+            }
 
-                }
-                .setPositiveButton("Save") { _, _ ->
-                    binding.tableId.text = chosenId.toString()
-                    tableId = chosenId
-                }.show()
-        }
 
-        binding.fromDateBtn.setOnClickListener {
-            pickFromDateTime()
-        }
-
-        binding.toDateBtn.setOnClickListener {
-            pickToDateTime()
-        }
-
-        binding.cancelBtn.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.createReservationBtn.setOnClickListener {
-            findNavController().navigateUp()
-//            findNavController().previousBackStackEntry?.savedStateHandle?.set(
-//                KEY,
-//                listOf(tableID, dateTime)
-//            )
         }
     }
 
@@ -93,11 +128,7 @@ class CreateReservationFragment : Fragment() {
                     requireContext(), { _, hour, minute ->
                         val pickedDateTime = Calendar.getInstance()
                         pickedDateTime.set(year, month, day, hour, minute)
-                        binding.fromDateBtn.text =
-                            SimpleDateFormat(
-                                "d MMMM, yyyy, h:mm a",
-                                Locale.getDefault()
-                            ).format(pickedDateTime.time)
+                        binding.fromDateBtn.text = formatDate(pickedDateTime.time)
                         fromDateTime = pickedDateTime
                     },
                     fromDateTime.get(Calendar.HOUR_OF_DAY),
@@ -119,10 +150,7 @@ class CreateReservationFragment : Fragment() {
                         val pickedDateTime = Calendar.getInstance()
                         pickedDateTime.set(year, month, day, hour, minute)
                         binding.toDateBtn.text =
-                            SimpleDateFormat(
-                                "d MMMM, yyyy, h:mm a",
-                                Locale.getDefault()
-                            ).format(pickedDateTime.time)
+                            formatDate(pickedDateTime.time)
                         toDateTime = pickedDateTime
                     },
                     toDateTime.get(Calendar.HOUR_OF_DAY),
@@ -134,6 +162,45 @@ class CreateReservationFragment : Fragment() {
             toDateTime.get(Calendar.MONTH),
             toDateTime.get(Calendar.DAY_OF_MONTH)
         ).show()
+    }
+
+    private fun createReservation(establishmentId: String) =
+        viewLifecycleOwner.lifecycleScope.launch {
+            when (val result = viewModel.createReservation(
+                establishmentId,
+                tableId,
+                Timestamp(fromDateTime.time),
+                Timestamp(toDateTime.time)
+            )) {
+                is FirebaseResult.Success -> {
+                    Snackbar.make(
+                        requireView(),
+                        "Reservation was created!",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    findNavController().navigateUp()
+                }
+                is FirebaseResult.Error -> {
+                    Snackbar.make(
+                        requireView(),
+                        result.exception.message ?: "Error",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+
+    private fun checkFields(): Boolean {
+        return if (fromDateTime >= toDateTime) {
+            Snackbar.make(
+                requireView(),
+                "No free reservations for such time period...",
+                Snackbar.LENGTH_SHORT
+            ).show()
+            false
+        } else {
+            true
+        }
     }
 
     override fun onDestroy() {

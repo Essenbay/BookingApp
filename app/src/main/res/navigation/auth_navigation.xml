@@ -28,6 +28,11 @@
         <action
             android:id="@+id/log_in_to_sign_up"
             app:destination="@id/accountSignUpFragment" />
+        <action
+            android:id="@+id/log_in_to_account"
+            app:destination="@id/accountAccountFragment"
+            app:popUpTo="@id/accountAccountFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/accountSignUpFragment"

@@ -1,17 +1,18 @@
 package com.example.bookingapp.data.datasource
 
-import android.util.Log
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.models.Reservation
 import com.example.bookingapp.data.repositories.EstablishmentRepository
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
+import com.example.bookingapp.util.EstablishmentNotFound
 import com.example.bookingapp.util.FirebaseResult
+import com.example.bookingapp.util.ReservationIsNotFree
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.lang.Exception
+import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -21,7 +22,6 @@ const val ESTABLISHMENT_COLLECTION = "establishments"
 
 class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository {
     private val db: FirebaseFirestore = Firebase.firestore
-
 
     override suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
         suspendCoroutine { cont ->
@@ -56,14 +56,17 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
 
     override suspend fun createReservation(
         userUID: String,
-        establishment: Establishment,
+        establishmentId: String,
         tableID: Int,
-        date: Timestamp
+        fromDate: Timestamp,
+        toDate: Timestamp
     ): FirebaseResult<Boolean> {
-        return when (val checkResult = checkIfReservationReserved(establishment.establishmentId, tableID, date)) {
+        return when (val checkResult =
+            checkIfReservationReserved(establishmentId, tableID, fromDate, toDate)) {
             is FirebaseResult.Success -> {
                 suspendCoroutine { cont ->
-                    val newReservation = Reservation(userUID, establishment, tableID, date)
+                    val newReservation =
+                        Reservation(userUID, establishmentId, tableID, fromDate, toDate)
                     db.collection(RESERVATION_COLLECTION).document().set(newReservation)
                         .addOnSuccessListener {
                             cont.resume(FirebaseResult.Success(true))
@@ -83,13 +86,16 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
     private suspend fun checkIfReservationReserved(
         establishmentId: String,
         tableID: Int,
-        date: Timestamp
+        fromDate: Timestamp,
+        toDate: Timestamp
     ): FirebaseResult<Boolean> {
         when (val resultRes = getReservationsByEstablishment(establishmentId)) {
             is FirebaseResult.Success -> {
                 for (res in resultRes.data) {
-                    if (res.dateTime == date && res.tableID == tableID) {
-                        return FirebaseResult.Success(false)
+                    if (res.fromDate.toDate().before(fromDate.toDate()) && res.toDate.toDate()
+                            .after(toDate.toDate()) && res.tableID == tableID
+                    ) {
+                        return FirebaseResult.Error(ReservationIsNotFree())
                     }
                 }
                 return FirebaseResult.Success(true)
@@ -128,21 +134,44 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
         }
 
 
-    override suspend fun getReservationByUser(userID: String): FirebaseResult<List<Reservation>> =
+    override suspend fun getReservationEstablishmentMapByUser(userID: String): Map<Reservation, Establishment> {
+        val reservations =
+            db.collection(RESERVATION_COLLECTION).whereEqualTo("userID", userID).get()
+                .await().documents.map {
+                val r = it.toObject(Reservation::class.java)
+                if (r == null) {
+                    return@map Reservation()
+                } else return@map r
+            }
+
+        val establishmentIds = reservations.map { it.establishmentId }.distinct()
+        val establishments = establishmentIds.map { establishmentId ->
+            db.collection("establishments").document(establishmentId).get().await()
+                .toObject(Establishment::class.java)
+        }
+        val establishmentsMap = establishments.associateBy { it?.establishmentId ?: "" }
+
+        return reservations.associateWith { reservation ->
+            establishmentsMap[reservation.establishmentId] ?: Establishment()
+        }
+    }
+
+    override suspend fun getEstablishmentById(establishmentId: String): Establishment =
         suspendCoroutine { cont ->
-            val snapshot = db.collection(RESERVATION_COLLECTION).whereEqualTo("userID", userID).get()
-            val reservations: MutableList<Reservation> = mutableListOf()
+            val snapshot =
+                db.collection(ESTABLISHMENT_COLLECTION).document(establishmentId).get()
             snapshot
                 .addOnSuccessListener { result ->
-                    for (document in result) {
-                        val reservation = document.toObject(Reservation::class.java)
-                        reservations.add(reservation)
+                    val establishment = result.toObject(Establishment::class.java)
+                    if (establishment != null) {
+                        cont.resume(establishment)
+                    } else {
+                        throw EstablishmentNotFound()
                     }
-                    cont.resume(FirebaseResult.Success(reservations))
                 }
                 .addOnFailureListener {
-                    cont.resume(FirebaseResult.Error(it))
+                    throw EstablishmentNotFound()
                 }
-        }
 
+        }
 }

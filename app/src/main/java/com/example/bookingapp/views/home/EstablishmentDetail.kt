@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import com.example.bookingapp.R
 import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.databinding.FragmentHomeEstablishmentDetailBinding
@@ -31,7 +32,7 @@ class EstablishmentDetail : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
     private val args: EstablishmentDetailArgs by navArgs()
-    private val viewModel: HomeEstablishmentDetailViewModel by viewModels {
+    private val viewModel: HomeEstablishmentDetailViewModel by navGraphViewModels(R.id.home_navigation) {
         HomeEstablishmentDetailViewModel.getFactory(
             args.establishmentID
         )
@@ -59,6 +60,8 @@ class EstablishmentDetail : Fragment() {
                 viewModel.establishment.collect {
                     when (it) {
                         is FirebaseResult.Success -> {
+                            binding.progressBar.visibility = View.INVISIBLE
+
                             binding.establishmentContent.visibility = View.VISIBLE
                             binding.progressBar.visibility = View.INVISIBLE
 
@@ -88,8 +91,13 @@ class EstablishmentDetail : Fragment() {
                             }
                         }
                         is FirebaseResult.Error -> {
+                            binding.progressBar.visibility = View.INVISIBLE
+
                             Snackbar.make(view, "${it.exception}", Snackbar.LENGTH_LONG).show()
                             findNavController().navigateUp()
+                        }
+                        else -> {
+                            binding.progressBar.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -100,21 +108,5 @@ class EstablishmentDetail : Fragment() {
     override fun onDestroy() {
         _binding = null
         super.onDestroy()
-    }
-
-    private fun createReservation(
-        establishment: Establishment,
-        tableID: Int,
-        date: Timestamp
-    ) = viewLifecycleOwner.lifecycleScope.launch {
-        when (val result = viewModel.createReservation(establishment, tableID, date)) {
-            is FirebaseResult.Success -> {
-                Toast.makeText(context, "The reservation was created", Toast.LENGTH_LONG).show()
-            }
-            is FirebaseResult.Error -> {
-                Toast.makeText(context, result.exception.message, Toast.LENGTH_LONG).show()
-            }
-        }
-        binding.progressBar.visibility = View.INVISIBLE
     }
 }

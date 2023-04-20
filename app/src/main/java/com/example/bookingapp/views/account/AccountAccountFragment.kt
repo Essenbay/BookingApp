@@ -51,7 +51,7 @@ class AccountAccountFragment : Fragment() {
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect {
                     if (it == null) {

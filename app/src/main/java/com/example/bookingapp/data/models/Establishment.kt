@@ -30,7 +30,7 @@ data class Establishment(
     }
 
     @Suppress("unused")
-    constructor() : this("", "", "", "", Timestamp(0, 0), Timestamp(0, 0), "", 0)
+    constructor() : this("", "Unknown", "", "", Timestamp(0, 0), Timestamp(0, 0), "", 0)
     constructor(
         name: String,
         description: String,

@@ -118,9 +118,8 @@ class HomeFragment : Fragment() {
                 binding.progressBar.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
             }
-            is SearchResult.Loading -> {
+            else -> {
                 binding.progressBar.visibility = View.VISIBLE
-
             }
         }
     }

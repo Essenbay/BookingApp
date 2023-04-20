@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.navGraphViewModels
+import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentEditUserInfoBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.viewmodels.AccountViewModel
@@ -21,7 +23,7 @@ class EditUserInfoFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AccountViewModel by viewModels { AccountViewModel.Factory }
+    private val viewModel: AccountViewModel by navGraphViewModels(R.id.auth_navigation) { AccountViewModel.Factory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

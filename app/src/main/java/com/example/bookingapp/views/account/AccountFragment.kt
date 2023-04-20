@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import com.example.bookingapp.R
 
 class AccountFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
