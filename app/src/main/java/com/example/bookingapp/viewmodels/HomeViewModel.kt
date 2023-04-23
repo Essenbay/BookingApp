@@ -11,8 +11,6 @@ import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
-import com.example.bookingapp.util.UserNotSignedIn
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

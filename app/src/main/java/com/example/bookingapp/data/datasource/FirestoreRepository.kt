@@ -1,11 +1,11 @@
 package com.example.bookingapp.data.datasource
 
-import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.models.Reservation
-import com.example.bookingapp.data.models.ReservationWithEstablishment
+import com.example.bookingapp.data.models.*
+import com.example.bookingapp.data.repositories.ReviewRepository
 import com.example.bookingapp.data.repositories.EstablishmentRepository
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
+import com.example.bookingapp.util.CommentNotFound
 import com.example.bookingapp.util.EstablishmentNotFound
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.ReservationIsNotFree
@@ -20,8 +20,10 @@ import kotlin.coroutines.suspendCoroutine
 const val USER_COLLECTION = "users"
 const val RESERVATION_COLLECTION = "reservations"
 const val ESTABLISHMENT_COLLECTION = "establishments"
+const val COMMENTS_COLLECTION = "comments"
 
-class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository {
+class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository,
+    ReviewRepository {
     private val db: FirebaseFirestore = Firebase.firestore
 
     override suspend fun getEstablishments(): FirebaseResult<List<Establishment>> =
@@ -147,7 +149,7 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
 
         val establishmentIds = reservations.map { it.establishmentId }.distinct()
         val establishments = establishmentIds.map { establishmentId ->
-            db.collection("establishments").document(establishmentId).get().await()
+            db.collection(ESTABLISHMENT_COLLECTION).document(establishmentId).get().await()
                 .toObject(Establishment::class.java)
         }
         val establishmentsMap = establishments.associateBy { it?.establishmentId ?: "" }
@@ -181,4 +183,55 @@ class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, Estab
                 }
 
         }
+
+    override suspend fun getReviewsByEstablishment(establishmentId: String): List<ReviewUI> {
+        val reviews =
+            db.collection(COMMENTS_COLLECTION).whereEqualTo("establishmentId", establishmentId)
+                .get().await().documents.map {
+                    val r = it.toObject(Review::class.java)
+                    if (r == null) {
+                        return@map Review()
+                    } else return@map r
+                }
+        val userIds = reviews.map { it.userId }.distinct()
+        val users = userIds.map { userId ->
+            getUserById(userId)
+        }
+        val usersMap = users.associateBy { it.uid }
+        val resultList: MutableList<ReviewUI> = mutableListOf()
+        reviews.forEach { review ->
+            resultList.add(
+                ReviewUI(
+                    review,
+                    usersMap[review.userId]?.fullName ?: "Unknown"
+                )
+            )
+        }
+        return resultList
+    }
+
+    suspend fun getUserById(userId: String): User =
+        db.collection(USER_COLLECTION).document(userId).get().await()
+            .toObject(User::class.java) ?: User()
+
+    override suspend fun createReview(
+        userId: String,
+        establishmentId: String,
+        dateOfCreation: Timestamp,
+        rate: Float,
+        comment: String
+    ): Boolean = suspendCoroutine { cont ->
+        val newReview = Review(userId, establishmentId, dateOfCreation, rate, comment)
+        val snapshot =
+            db.collection(COMMENTS_COLLECTION).document().set(newReview)
+        snapshot
+            .addOnSuccessListener {
+
+                cont.resume(true)
+            }
+            .addOnFailureListener {
+                throw EstablishmentNotFound()
+            }
+
+    }
 }

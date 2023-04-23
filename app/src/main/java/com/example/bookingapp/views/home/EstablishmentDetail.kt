@@ -5,25 +5,25 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.R
+import com.example.bookingapp.adapters.ReviewsAdapter
 import com.example.bookingapp.data.models.Establishment
+import com.example.bookingapp.data.models.Review
+import com.example.bookingapp.data.models.ReviewUI
 import com.example.bookingapp.databinding.FragmentHomeEstablishmentDetailBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.viewmodels.HomeEstablishmentDetailViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
-import java.sql.Time
-import java.time.LocalTime
 
 class EstablishmentDetail : Fragment() {
     private var _binding: FragmentHomeEstablishmentDetailBinding? = null
@@ -56,42 +56,26 @@ class EstablishmentDetail : Fragment() {
             findNavController().navigateUp()
         }
 
-        setClickListener()
+        binding.comments.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.btnCreateComment.setOnClickListener {
+            createReview(view)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.reviews.collect {
+                    updateCommentUI(it)
+                }
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.establishment.collect {
                     when (it) {
                         is FirebaseResult.Success -> {
-                            binding.progressBar.visibility = View.INVISIBLE
-
-                            binding.establishmentContent.visibility = View.VISIBLE
-                            binding.progressBar.visibility = View.INVISIBLE
-
-                            val est = it.data
-                            binding.establishmentName.text = est.name
-                            binding.establishmentDescription.text = est.description
-                            binding.establishmentAddress.text = est.address
-                            val workingTimeStartStr =
-                                DateFormat.format("HH:mm", est.workingTimeStart.toDate())
-                            val workingTimeEndStr =
-                                DateFormat.format("HH:mm", est.workingTimeEnd.toDate())
-                            binding.establishmentTime.text = getString(
-                                R.string.establishment_time,
-                                workingTimeStartStr,
-                                workingTimeEndStr
-                            )
-                            binding.establishmentPhoneNumbers.text = est.phoneNumbers
-                            binding.establishmentTableNumber.text = est.tableNumber.toString()
-
-                            binding.createReservationBtn.setOnClickListener {
-                                findNavController().navigate(
-                                    EstablishmentDetailDirections.toCreateReservation(
-                                        est
-                                    )
-                                )
-//                                createReservation(est, est.tableNumber, Timestamp.now())
-                            }
+                            updateEstablishmentInfoUi(it.data)
                         }
                         is FirebaseResult.Error -> {
                             binding.progressBar.visibility = View.INVISIBLE
@@ -100,6 +84,9 @@ class EstablishmentDetail : Fragment() {
                             findNavController().navigateUp()
                         }
                         else -> {
+                            binding.createReservationBtn.visibility = View.INVISIBLE
+                            binding.commentContent.visibility = View.INVISIBLE
+                            binding.establishmentContent.visibility = View.INVISIBLE
                             binding.progressBar.visibility = View.VISIBLE
                         }
                     }
@@ -108,13 +95,60 @@ class EstablishmentDetail : Fragment() {
         }
     }
 
-    private fun setClickListener() {
-        binding.btnSubmit.setOnClickListener {
-            val msg = binding.ratingBar.rating.toString()
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    private fun updateCommentUI(reviews: List<ReviewUI>) {
+        binding.comments.adapter = ReviewsAdapter(reviews)
+    }
+
+    private fun updateEstablishmentInfoUi(est: Establishment) {
+        binding.progressBar.visibility = View.INVISIBLE
+
+        binding.createReservationBtn.visibility = View.VISIBLE
+        binding.commentContent.visibility = View.VISIBLE
+        binding.establishmentContent.visibility = View.VISIBLE
+
+
+        //Show establishment info
+        binding.establishmentName.text = est.name
+        binding.establishmentDescription.text = est.description
+        binding.establishmentAddress.text = est.address
+        val workingTimeStartStr =
+            DateFormat.format("HH:mm", est.workingTimeStart.toDate())
+        val workingTimeEndStr =
+            DateFormat.format("HH:mm", est.workingTimeEnd.toDate())
+        binding.establishmentTime.text = getString(
+            R.string.establishment_time,
+            workingTimeStartStr,
+            workingTimeEndStr
+        )
+        binding.establishmentPhoneNumbers.text = est.phoneNumbers
+        binding.establishmentTableNumber.text = est.tableNumber.toString()
+
+        //Create reservation
+        binding.createReservationBtn.setOnClickListener {
+            findNavController().navigate(
+                EstablishmentDetailDirections.toCreateReservation(
+                    est
+                )
+            )
         }
     }
 
+    private fun createReview(view: View) = try {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val date = Timestamp.now()
+            val rate = binding.ratingBar.rating
+            val comment: String = binding.commentEdit.text.toString()
+            if (comment.isEmpty()) Snackbar.make(view, "Print a comment", Snackbar.LENGTH_SHORT)
+                .show()
+            else {
+                val result = viewModel.createReview(args.establishmentID, date, rate, comment)
+                if (result) Snackbar.make(view, "Review successfully posted", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    } catch (e: Exception) {
+        Snackbar.make(view, e.message ?: "Something went wrong...", Snackbar.LENGTH_SHORT).show()
+    }
 
     override fun onDestroy() {
         _binding = null
