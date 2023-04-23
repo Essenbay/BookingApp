@@ -34,9 +34,11 @@ class ReservationAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(pair: ReservationWithEstablishment) {
             binding.reservationName.text = pair.establishment.name
-            val reservationDate =
+            val reservationDateFrom =
                 formatDate(pair.reservation.fromDate.toDate())
-            binding.reservationDate.text = reservationDate
+            val reservationDateTo =
+                formatDate(pair.reservation.toDate.toDate())
+            binding.reservationDate.text = "$reservationDateFrom - $reservationDateTo"
             binding.reservationAddress.text = pair.establishment.address
             binding.tableID.text = pair.reservation.tableID.toString()
         }
