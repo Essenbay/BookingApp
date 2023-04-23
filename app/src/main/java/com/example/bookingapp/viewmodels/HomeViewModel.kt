@@ -11,6 +11,7 @@ import com.example.bookingapp.data.repositories.AccessUser
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,6 +32,11 @@ class HomeViewModel(
 
     init {
         getEstablishments()
+//        val newEstablishment =
+//            Establishment("", "", "", Timestamp.now(), Timestamp.now(), "", 1)
+//        viewModelScope.launch {
+//            addEstablishment(newEstablishment)
+//        }
     }
 
     suspend fun searchEstablishments(query: String?) {
