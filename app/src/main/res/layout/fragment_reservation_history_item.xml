@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/reservation_date"
+        android:id="@+id/reservation_date_from"
         style="@style/TextAppearance.Material3.BodyMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,6 +36,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reservation_name" />
 
+    <TextView
+        android:id="@+id/reservation_date_to"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textColor="@color/gray_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reservation_date_from" />
 
     <TextView
         android:id="@+id/reservation_address"
@@ -44,7 +53,7 @@
         android:layout_height="wrap_content"
         android:text="Address"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reservation_date" />
+        app:layout_constraintTop_toBottomOf="@+id/reservation_date_to" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

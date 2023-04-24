@@ -38,7 +38,8 @@ class ReservationAdapter(
                 formatDate(pair.reservation.fromDate.toDate())
             val reservationDateTo =
                 formatDate(pair.reservation.toDate.toDate())
-            binding.reservationDate.text = "$reservationDateFrom - $reservationDateTo"
+            binding.reservationDateFrom.text = "From: $reservationDateFrom"
+            binding.reservationDateTo.text = "To: $reservationDateTo"
             binding.reservationAddress.text = pair.establishment.address
             binding.tableID.text = pair.reservation.tableID.toString()
         }
