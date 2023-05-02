@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.bookingapp.R
 
-class HomeContainerFragment:Fragment() {
+class HomeActivity:Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home_container, container, false)
+        return inflater.inflate(R.layout.activity_home, container, false)
     }
 }
