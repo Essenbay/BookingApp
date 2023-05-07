@@ -6,43 +6,43 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookingapp.R
 import com.example.bookingapp.adapters.ReviewsAdapter
 import com.example.bookingapp.data.models.Establishment
-import com.example.bookingapp.data.models.Review
 import com.example.bookingapp.data.models.ReviewUI
 import com.example.bookingapp.databinding.FragmentHomeEstablishmentDetailBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.viewmodels.HomeEstablishmentDetailViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-class EstablishmentDetail : Fragment() {
+@AndroidEntryPoint
+class EstablishmentDetailFragment : Fragment() {
     private var _binding: FragmentHomeEstablishmentDetailBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val args: EstablishmentDetailArgs by navArgs()
-    private val viewModel: HomeEstablishmentDetailViewModel by navGraphViewModels(R.id.home_navigation) {
-        HomeEstablishmentDetailViewModel.getFactory(
-            args.establishmentID
-        )
+    private val args: EstablishmentDetailFragmentArgs by navArgs()
+    private val viewModel: HomeEstablishmentDetailViewModel by lazy {
+        val viewModel: HomeEstablishmentDetailViewModel by viewModels()
+        viewModel.establishmentID = args.establishmentID
+        viewModel
     }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentHomeEstablishmentDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -126,7 +126,7 @@ class EstablishmentDetail : Fragment() {
         //Create reservation
         binding.createReservationBtn.setOnClickListener {
             findNavController().navigate(
-                EstablishmentDetailDirections.toCreateReservation(
+                EstablishmentDetailFragmentDirections.toCreateReservation(
                     est
                 )
             )

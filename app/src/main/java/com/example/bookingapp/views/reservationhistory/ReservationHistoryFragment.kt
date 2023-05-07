@@ -1,11 +1,11 @@
 package com.example.bookingapp.views.reservationhistory
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,18 +16,22 @@ import com.example.bookingapp.R
 import com.example.bookingapp.adapters.ReservationAdapter
 import com.example.bookingapp.data.models.ReservationWithEstablishment
 import com.example.bookingapp.databinding.FragmentReservationHistoryBinding
-import com.example.bookingapp.util.*
+import com.example.bookingapp.util.SearchResult
+import com.example.bookingapp.util.UserNotSignedIn
 import com.example.bookingapp.viewmodels.ReservationsViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ReservationHistoryFragment : Fragment() {
     private var _binding: FragmentReservationHistoryBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val viewModel: ReservationsViewModel by viewModels { ReservationsViewModel.Factory }
+
+    private val viewModel: ReservationsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

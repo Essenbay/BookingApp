@@ -13,8 +13,10 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import it.czerwinski.android.hilt.annotations.BoundTo
 import kotlinx.coroutines.tasks.await
 import java.util.*
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -23,7 +25,7 @@ const val RESERVATION_COLLECTION = "reservations"
 const val ESTABLISHMENT_COLLECTION = "establishments"
 const val COMMENTS_COLLECTION = "comments"
 
-class FirestoreRepository : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository,
+class FirestoreRepository @Inject constructor() : ReceiveReservations, EstablishmentsRepository, EstablishmentRepository,
     ReviewRepository {
     private val db: FirebaseFirestore = Firebase.firestore
 

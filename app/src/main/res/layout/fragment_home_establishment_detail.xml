@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingHorizontal="15dp"
-    tools:context=".views.home.EstablishmentDetail">
+    tools:context=".views.home.EstablishmentDetailFragment">
 
     <ProgressBar
         android:id="@+id/progress_bar"

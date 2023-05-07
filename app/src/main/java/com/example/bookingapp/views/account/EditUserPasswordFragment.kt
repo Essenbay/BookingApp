@@ -9,17 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.navGraphViewModels
 import com.example.bookingapp.AuthNavigationDirections
-import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentEditUserPasswordBinding
 import com.example.bookingapp.util.FirebaseResult
-import com.example.bookingapp.util.checkLoginField
 import com.example.bookingapp.util.checkPasswordField
 import com.example.bookingapp.util.checkPasswordMatching
 import com.example.bookingapp.viewmodels.AccountViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class EditUserPasswordFragment : Fragment() {
     private var _binding: FragmentEditUserPasswordBinding? = null
     private val binding
@@ -27,8 +26,7 @@ class EditUserPasswordFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AccountViewModel by navGraphViewModels(R.id.auth_navigation) { AccountViewModel.Factory }
-
+    private val viewModel: AccountViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,6 +54,7 @@ class EditUserPasswordFragment : Fragment() {
             }
         }
     }
+
     //Todo: Add "forgot password?" function
     private fun editUserPassword(currPassword: String, newPassword: String, view: View) =
         viewLifecycleOwner.lifecycleScope.launch {

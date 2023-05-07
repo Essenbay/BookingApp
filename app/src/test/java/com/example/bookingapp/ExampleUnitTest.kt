@@ -2,8 +2,6 @@ package com.example.bookingapp
 
 import org.junit.Test
 
-import org.junit.Assert.*
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -11,7 +9,32 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun main() {
+        val rectangle = Rectangle(10.0,20.0)
+        val square = Square(10.0)
+        rectangle.width = 30.0
+        rectangle.height= 40.0
+        println(rectangle)
+
+        println("Square first: $square")
+        square.value= 20.0
+        println("Square second: $square")
     }
 }
+
+interface Figure {
+    val width: Double
+    val height: Double
+    val area: Double
+}
+
+class Rectangle(override var width: Double, override var height: Double): Figure {
+    override val area = width * height
+}
+
+class Square(var value: Double):Figure {
+    override val width: Double = value
+    override val height: Double = value
+    override val area: Double = value
+}
+

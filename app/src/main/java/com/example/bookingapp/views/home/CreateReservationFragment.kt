@@ -8,23 +8,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
-import com.example.bookingapp.R
-import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.databinding.FragmentReservationCreateBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.formatDate
 import com.example.bookingapp.viewmodels.HomeEstablishmentDetailViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.*
 
+@AndroidEntryPoint
 class CreateReservationFragment : Fragment() {
     private val args: CreateReservationFragmentArgs by navArgs()
     private var _binding: FragmentReservationCreateBinding? = null
@@ -35,10 +35,10 @@ class CreateReservationFragment : Fragment() {
     private var fromDateTime: Calendar = Calendar.getInstance()
     private var toDateTime: Calendar = Calendar.getInstance()
     private var tableId: Int = 1
-    private val viewModel: HomeEstablishmentDetailViewModel by navGraphViewModels(R.id.home_navigation) {
-        HomeEstablishmentDetailViewModel.getFactory(
-            args.establishment.establishmentId
-        )
+    private val viewModel: HomeEstablishmentDetailViewModel by lazy {
+        val viewModel: HomeEstablishmentDetailViewModel by viewModels()
+        viewModel.establishmentID = args.establishment.establishmentId
+        viewModel
     }
 
     override fun onCreateView(

@@ -25,7 +25,7 @@
         tools:layout="@layout/fragment_home_add_establishment" />
     <fragment
         android:id="@+id/establishmentDetail"
-        android:name="com.example.bookingapp.views.home.EstablishmentDetail"
+        android:name="com.example.bookingapp.views.home.EstablishmentDetailFragment"
         android:label="EstablishmentDetail"
         tools:layout="@layout/fragment_home_establishment_detail">
         <argument

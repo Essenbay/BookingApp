@@ -1,14 +1,10 @@
 package com.example.bookingapp
 
 import android.app.Application
-import com.example.bookingapp.data.AppContainer
+import dagger.hilt.android.HiltAndroidApp
 
 //Todo: Add documentation to code
+@HiltAndroidApp
 class BookingApplication : Application() {
-    lateinit var container: AppContainer
 
-    override fun onCreate() {
-        super.onCreate()
-        container = AppContainer()
-    }
 }

@@ -9,13 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.navGraphViewModels
-import com.example.bookingapp.R
 import com.example.bookingapp.databinding.FragmentEditUserInfoBinding
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.viewmodels.AccountViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class EditUserInfoFragment : Fragment() {
     private var _binding: FragmentEditUserInfoBinding? = null
     private val binding
@@ -23,7 +23,7 @@ class EditUserInfoFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val viewModel: AccountViewModel by navGraphViewModels(R.id.auth_navigation) { AccountViewModel.Factory }
+    private val viewModel: AccountViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +32,6 @@ class EditUserInfoFragment : Fragment() {
         _binding = FragmentEditUserInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.editFullName.setText(viewModel.user.value?.displayName)

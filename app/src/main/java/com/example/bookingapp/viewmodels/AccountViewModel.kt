@@ -1,22 +1,17 @@
 package com.example.bookingapp.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.bookingapp.BookingApplication
 import com.example.bookingapp.data.repositories.UserRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class AccountViewModel(private val userRepository: UserRepository) : ViewModel() {
+@HiltViewModel
+class AccountViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
     val user: StateFlow<FirebaseUser?> = userRepository.user
 
     suspend fun register(
@@ -45,14 +40,4 @@ class AccountViewModel(private val userRepository: UserRepository) : ViewModel()
         password: String,
         newPassword: String
     ) = userRepository.editUserPassword(password, newPassword)
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as BookingApplication)
-                val userRepository = application.container.userRepository
-                AccountViewModel(userRepository)
-            }
-        }
-    }
 }

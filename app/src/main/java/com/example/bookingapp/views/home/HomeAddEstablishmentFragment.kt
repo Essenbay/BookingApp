@@ -1,16 +1,12 @@
 package com.example.bookingapp.views.home
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.icu.util.GregorianCalendar
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,21 +18,23 @@ import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.checkPhoneNumberField
 import com.example.bookingapp.viewmodels.HomeViewModel
 import com.google.firebase.Timestamp
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.sql.Time
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
 
+@AndroidEntryPoint
 class HomeAddEstablishmentFragment : Fragment() {
     private var _binding: FragmentHomeAddEstablishmentBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val viewModel: HomeViewModel by viewModels { HomeViewModel.Factory }
+    private val viewModel: HomeViewModel by viewModels()
 
     private lateinit var workingTimeStart: Timestamp
     private lateinit var workingTimeEnd: Timestamp
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
