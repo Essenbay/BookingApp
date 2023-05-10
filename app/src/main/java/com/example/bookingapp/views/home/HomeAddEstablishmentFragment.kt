@@ -128,17 +128,16 @@ class HomeAddEstablishmentFragment : Fragment() {
     private fun startCreatingEstablishment(establishment: Establishment) =
         viewLifecycleOwner.lifecycleScope.launch {
             binding.progressBar.visibility = View.VISIBLE
-            try {
-                val result = viewModel.addEstablishment(establishment)
-                if (result) {
+            when (val result = viewModel.addEstablishment(establishment)) {
+                is FirebaseResult.Success -> {
                     Toast.makeText(context, "Request send", Toast.LENGTH_LONG).show()
                     findNavController().navigateUp()
-                } else {
-                    Toast.makeText(context, "An unexpected behavior occured", Toast.LENGTH_LONG)
-                        .show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+                is FirebaseResult.Error -> Toast.makeText(
+                    context,
+                    result.exception.message ?: "An error occurred...",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             binding.progressBar.visibility = View.INVISIBLE
         }

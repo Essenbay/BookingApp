@@ -9,6 +9,7 @@ import com.example.bookingapp.util.SearchResult
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,23 +26,16 @@ class HomeViewModel @Inject constructor(
     private var _filteredEstablishments: MutableStateFlow<SearchResult<List<Establishment>>> =
         MutableStateFlow(SearchResult.Loading)
     val filteredEstablishments = _filteredEstablishments.asStateFlow()
-
+    private var _progressBarVisibility: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val progressBarVisibility: StateFlow<Boolean> = _progressBarVisibility.asStateFlow()
 
     init {
         getEstablishments()
-//        val newEstablishment =
-//            Establishment("", "", "", Timestamp.now(), Timestamp.now(), "", 1)
-//        viewModelScope.launch {
-//            addEstablishment(newEstablishment)
-//        }
     }
-
     suspend fun searchEstablishments(query: String?) {
         val result = startSearchEstablishments(query)
         _filteredEstablishments.update { result }
     }
-
-    //Todo: Filter???
 
     private suspend fun startSearchEstablishments(query: String?): SearchResult<List<Establishment>> =
         //Todo: Add search by description
@@ -58,10 +52,11 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-    suspend fun addEstablishment(newEstablishment: Establishment): Boolean =
+    suspend fun addEstablishment(newEstablishment: Establishment): FirebaseResult<Boolean> =
         establishmentsRepository.createEstablishment(newEstablishment)
 
     fun getEstablishments() = viewModelScope.launch {
+        _progressBarVisibility.update { true }
         when (val result = establishmentsRepository.getEstablishments()) {
             is FirebaseResult.Success -> {
                 _establishments = result.data
@@ -71,5 +66,6 @@ class HomeViewModel @Inject constructor(
                 SearchResult.Error(result.exception)
             }
         }
+        _progressBarVisibility.update { false }
     }
 }

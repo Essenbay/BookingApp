@@ -1,6 +1,7 @@
 package com.example.bookingapp.views.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -82,6 +83,16 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.progressBarVisibility.collect {
+                    binding.progressBar.visibility =
+                        if (it) View.VISIBLE
+                        else View.INVISIBLE
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.filteredEstablishments.collect {
                     handleFilteredEstablishments(it)
                 }
@@ -93,7 +104,6 @@ class HomeFragment : Fragment() {
         viewModel.searchEstablishments(query)
     }
 
-    //Todo: Progress bar is not showing
     private fun handleFilteredEstablishments(result: SearchResult<List<Establishment>>) {
         when (result) {
             is SearchResult.Success -> {
@@ -105,20 +115,17 @@ class HomeFragment : Fragment() {
                         findNavController().navigate(action)
                     }
                 binding.emptyResultMsg.visibility = View.INVISIBLE
-                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
                 binding.establishments.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
-                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Error -> {
                 binding.emptyResultMsg.visibility = View.INVISIBLE
-                binding.progressBar.visibility = View.INVISIBLE
                 view?.let { Snackbar.make(it, "Something went wrong...", Snackbar.LENGTH_LONG) }
             }
             else -> {
-                binding.progressBar.visibility = View.VISIBLE
+
             }
         }
     }

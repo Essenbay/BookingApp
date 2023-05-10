@@ -28,26 +28,27 @@ class ReservationsViewModel @Inject constructor(
         MutableStateFlow(SearchResult.Loading)
     val filteredReservations = _filteredReservations.asStateFlow()
     val user: StateFlow<FirebaseUser?> = userRepository.user
+    private var _progressBarVisibility: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val progressBarVisibility: StateFlow<Boolean> = _progressBarVisibility.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            user.collect {
-                if (it != null) {
-                    getReservations()
+        getReservations()
+    }
+    fun getReservations() = viewModelScope.launch {
+        _progressBarVisibility.update { true }
+        user.collect {
+            if (it != null) {
+                if(user.value != null) {
+                    val result = reservationRepository.getReservationEstablishmentByUser(user.value!!.uid)
+                    _reservationEstablishments = result
+                    searchReservations("")
+                } else {
+                    _filteredReservations.update {
+                        SearchResult.Error(UserNotSignedIn())
+                    }
                 }
             }
-        }
-    }
-
-    fun getReservations() = viewModelScope.launch {
-        if(user.value != null) {
-            val result = reservationRepository.getReservationEstablishmentByUser(user.value!!.uid)
-            _reservationEstablishments = result
-            searchReservations("")
-        } else {
-            _filteredReservations.update {
-                SearchResult.Error(UserNotSignedIn())
-            }
+            _progressBarVisibility.update { false }
         }
     }
 

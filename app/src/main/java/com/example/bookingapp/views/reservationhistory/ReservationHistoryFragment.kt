@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -88,6 +89,16 @@ class ReservationHistoryFragment : Fragment() {
             }
         })
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.progressBarVisibility.collect {
+                    binding.progressBar.visibility =
+                        if (it) View.VISIBLE
+                        else View.INVISIBLE
+                }
+            }
+        }
+
         binding.reservations.layoutManager = LinearLayoutManager(context)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -109,18 +120,15 @@ class ReservationHistoryFragment : Fragment() {
     ) {
         when (result) {
             is SearchResult.Success -> {
+                binding.reservations.visibility = View.VISIBLE
                 binding.reservations.adapter = ReservationAdapter(result.result) {
                     Snackbar.make(view, "Reservation clicked", Snackbar.LENGTH_SHORT).show()
                 }
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }
             is SearchResult.Empty -> {
-                binding.reservations.adapter = ReservationAdapter(emptyList()) {
-                    Snackbar.make(view, "Reservation clicked", Snackbar.LENGTH_SHORT).show()
-                }
                 binding.reservations.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.VISIBLE
-                binding.progressBar.visibility = View.INVISIBLE
             }
             is SearchResult.Error -> {
                 if (result.exception is UserNotSignedIn) {
@@ -129,12 +137,10 @@ class ReservationHistoryFragment : Fragment() {
                     findNavController().navigate(action)
                 } else {
                     binding.emptyResultMsg.visibility = View.INVISIBLE
-                    binding.progressBar.visibility = View.INVISIBLE
                     Snackbar.make(view, "Something went wrong...", Snackbar.LENGTH_LONG).show()
                 }
             }
             else -> {
-                binding.progressBar.visibility = View.VISIBLE
                 binding.reservations.visibility = View.INVISIBLE
                 binding.emptyResultMsg.visibility = View.INVISIBLE
             }

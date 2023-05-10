@@ -1,12 +1,10 @@
 package com.example.bookingapp.data.datasource
 
-import android.util.Log
 import com.example.bookingapp.data.models.*
-import com.example.bookingapp.data.repositories.ReviewRepository
 import com.example.bookingapp.data.repositories.EstablishmentRepository
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.data.repositories.ReceiveReservations
-import com.example.bookingapp.util.CommentNotFound
+import com.example.bookingapp.data.repositories.ReviewRepository
 import com.example.bookingapp.util.EstablishmentNotFound
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.ReservationIsNotFree
@@ -14,12 +12,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import it.czerwinski.android.hilt.annotations.BoundTo
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.*
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -132,14 +125,14 @@ class FirestoreRepository @Inject constructor() : ReceiveReservations, Establish
                 }
         }
 
-    override suspend fun createEstablishment(establishment: Establishment): Boolean =
+    override suspend fun createEstablishment(establishment: Establishment): FirebaseResult<Boolean> =
         suspendCoroutine { cont ->
             db.collection(ESTABLISHMENT_COLLECTION).document().set(establishment)
                 .addOnSuccessListener {
-                    cont.resume(true)
+                    cont.resume(FirebaseResult.Success(true))
                 }
                 .addOnFailureListener {
-                    cont.resume(false)
+                    cont.resume(FirebaseResult.Error(it))
                     throw it
                 }
         }
@@ -234,7 +227,6 @@ class FirestoreRepository @Inject constructor() : ReceiveReservations, Establish
             db.collection(COMMENTS_COLLECTION).document().set(newReview)
         snapshot
             .addOnSuccessListener {
-
                 cont.resume(true)
             }
             .addOnFailureListener {

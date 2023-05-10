@@ -9,5 +9,5 @@ interface EstablishmentsRepository {
     suspend fun getEstablishments(): FirebaseResult<List<Establishment>>
 
     suspend fun getReservationsByEstablishment(establishmentID: String): FirebaseResult<List<Reservation>>
-    suspend fun createEstablishment(establishment: Establishment): Boolean
+    suspend fun createEstablishment(establishment: Establishment): FirebaseResult<Boolean>
 }

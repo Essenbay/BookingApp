@@ -35,7 +35,8 @@
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/home_toolbar"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="30dp"
         android:layout_centerHorizontal="true"
         android:visibility="invisible" />
 
