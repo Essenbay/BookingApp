@@ -127,6 +127,13 @@
             android:layout_height="wrap_content"
             android:hint="Number of tables"
             android:inputType="numberDecimal" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

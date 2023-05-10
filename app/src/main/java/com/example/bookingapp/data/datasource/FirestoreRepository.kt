@@ -1,5 +1,6 @@
 package com.example.bookingapp.data.datasource
 
+import android.util.Log
 import com.example.bookingapp.data.models.*
 import com.example.bookingapp.data.repositories.ReviewRepository
 import com.example.bookingapp.data.repositories.EstablishmentRepository
@@ -14,6 +15,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import it.czerwinski.android.hilt.annotations.BoundTo
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
@@ -128,14 +132,15 @@ class FirestoreRepository @Inject constructor() : ReceiveReservations, Establish
                 }
         }
 
-    override suspend fun createEstablishment(establishment: Establishment): FirebaseResult<Boolean> =
+    override suspend fun createEstablishment(establishment: Establishment): Boolean =
         suspendCoroutine { cont ->
             db.collection(ESTABLISHMENT_COLLECTION).document().set(establishment)
                 .addOnSuccessListener {
-                    cont.resume(FirebaseResult.Success(true))
+                    cont.resume(true)
                 }
                 .addOnFailureListener {
-                    cont.resume(FirebaseResult.Error(it))
+                    cont.resume(false)
+                    throw it
                 }
         }
 

@@ -6,6 +6,7 @@ import com.example.bookingapp.data.models.Establishment
 import com.example.bookingapp.data.repositories.EstablishmentsRepository
 import com.example.bookingapp.util.FirebaseResult
 import com.example.bookingapp.util.SearchResult
+import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,7 +58,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-    suspend fun addEstablishment(newEstablishment: Establishment): FirebaseResult<Boolean> =
+    suspend fun addEstablishment(newEstablishment: Establishment): Boolean =
         establishmentsRepository.createEstablishment(newEstablishment)
 
     fun getEstablishments() = viewModelScope.launch {

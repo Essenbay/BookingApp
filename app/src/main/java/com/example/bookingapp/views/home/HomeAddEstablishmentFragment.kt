@@ -2,6 +2,7 @@ package com.example.bookingapp.views.home
 
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,10 +98,13 @@ class HomeAddEstablishmentFragment : Fragment() {
                 Toast.makeText(context, "Fields must not be blank", Toast.LENGTH_LONG).show()
             else if (!checkPhoneNumberField(phoneNumber))
                 Toast.makeText(context, "Phone number is badly formatted", Toast.LENGTH_LONG).show()
-            else if(tableNum <= 0) {
-                Toast.makeText(context, "Number of tables must be positive number", Toast.LENGTH_LONG).show()
-            }
-            else {
+            else if (tableNum <= 0) {
+                Toast.makeText(
+                    context,
+                    "Number of tables must be positive number",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
                 val newEstablishment = Establishment(
                     title,
                     description,
@@ -123,15 +127,20 @@ class HomeAddEstablishmentFragment : Fragment() {
 
     private fun startCreatingEstablishment(establishment: Establishment) =
         viewLifecycleOwner.lifecycleScope.launch {
-            when (val result = viewModel.addEstablishment(establishment)) {
-                is FirebaseResult.Success -> {
+            binding.progressBar.visibility = View.VISIBLE
+            try {
+                val result = viewModel.addEstablishment(establishment)
+                if (result) {
                     Toast.makeText(context, "Request send", Toast.LENGTH_LONG).show()
                     findNavController().navigateUp()
+                } else {
+                    Toast.makeText(context, "An unexpected behavior occured", Toast.LENGTH_LONG)
+                        .show()
                 }
-                is FirebaseResult.Error -> {
-                    Toast.makeText(context, result.exception.toString(), Toast.LENGTH_LONG).show()
-                }
+            } catch (e: Exception) {
+                Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
             }
+            binding.progressBar.visibility = View.INVISIBLE
         }
 
     override fun onDestroy() {
