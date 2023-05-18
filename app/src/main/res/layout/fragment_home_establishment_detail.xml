@@ -162,6 +162,7 @@
                 android:numStars="5"
                 android:stepSize="0.5"
                 android:text="Rating"
+                android:isIndicator="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

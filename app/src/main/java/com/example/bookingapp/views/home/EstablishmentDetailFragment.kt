@@ -56,6 +56,8 @@ class EstablishmentDetailFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        binding.ratingBar.isEnabled = true
+
         binding.comments.layoutManager = LinearLayoutManager(requireContext())
 
         binding.btnCreateComment.setOnClickListener {
